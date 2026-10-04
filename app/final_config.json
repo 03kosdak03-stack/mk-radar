@@ -1,0 +1,49 @@
+{
+  "version": "MK Final 1.0",
+  "frozen_at": "2026-10-03",
+  "primary_model": "Direct_forward_value",
+  "ranking_feature": "forward_yield",
+  "ranking_weights": {
+    "forward_yield": 1.0
+  },
+  "top_count": 15,
+  "portfolio_count": 5,
+  "portfolio_selection": "First five within top15 with approximate prior20day median turnover at least TRY5000000",
+  "equal_weights": true,
+  "minimum_turnover_try": 5000000,
+  "entry_timing_signal": false,
+  "value_entry_gate": false,
+  "scenarios": {
+    "bear": {
+      "growth_scale": 0.25,
+      "pe": 12
+    },
+    "base": {
+      "growth_scale": 0.5,
+      "pe": 16
+    },
+    "bull": {
+      "growth_scale": 1,
+      "pe": 20
+    }
+  },
+  "expense_growth_fraction": 0.5,
+  "growth_clip": [
+    -0.2,
+    1.0
+  ],
+  "expense_growth_floor": -0.1,
+  "tax_assumption": 0.25,
+  "financing_gain_cap": 0,
+  "holding_max_years": 1,
+  "exit_rule": "Static base target: first subsequent high reaching target; fill at max(target, open); otherwise deadline close. No supported positive earnings target => hold to deadline.",
+  "fees_each_side": 0.001,
+  "no_reinvestment": true,
+  "project_premium": "No premium without dated complete incremental economics; revenue/backlog is not profit.",
+  "missing_data": "None with explicit reason, never automatic zero",
+  "fair_value_status": "Uncalibrated forward earnings scenarios, not verified fair values",
+  "validation_status": "Retrospective development only",
+  "current_full_universe_valuation_completed": false,
+  "current_recommendations": false,
+  "bank_holding_reit": "Separate sector models required; unsupported sectors not forced into industrial formula"
+}
