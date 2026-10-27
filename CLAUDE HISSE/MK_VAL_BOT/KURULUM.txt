@@ -1,0 +1,20 @@
+ÜCRETSİZ GITHUB PAGES + TELEGRAM
+
+ZIP dosyasını çıkar. mk-val klasörünü mevcut mk-radar deposunun köküne yükle.
+GitHub: Add file > Upload files > mk-val klasörünü sürükle > Commit changes.
+Mevcut Pages yayını depo kökünden yapılıyorsa adres:
+https://03kosdak03-stack.github.io/mk-radar/mk-val/
+Adres açılmadan Telegram menüsüne bağlama.
+
+BotFather: /setmenubutton > @kosdak_hisse_degerleme_bot > yayın adresi > MK VAL
+BotFather istemlerinin sırasını takip et. Bot tokenı bu işlem için gerekmez.
+Telegram bot sohbetindeki menüden ekranı aç.
+
+HAFTALIK: Yeni final_snapshot.json dosyasını GitHub mk-val klasörüne yükle,
+Commit changes de. ZIP'i açıp dosyayı yükle; ZIP'in kendisini GitHub'a yükleme.
+Güncelleme yeni veriyi gösterir; değerleme hesaplamasını MK VAL motoru yapar.
+İlk paketin verisi 23 Ekim 2026 tarihlidir.
+
+Bu ücretsiz sürümde sohbet komutları, bota ZIP göndererek veri yükleme ve
+otomatik bildirim çalışmaz. Hisse ekranı ve sanal portföy çalışır.
+Tarama verileri ve site herkese açıktır. Tokenı hiçbir dosyaya ekleme.

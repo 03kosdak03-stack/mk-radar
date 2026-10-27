@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<title>MK Hisseler</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one-column phone list (Telegram mini app); tapping a row slides in a full-screen "why cheap" sheet. */
+:root{
+  --bg:#f2f4f1; --surface:#ffffff; --surface2:#eef2ef; --ink:#15211d; --muted:#5b6964; --line:#dbe2de;
+  --value:#0a7457; --value-soft:#dcefe7; --gold:#a8670f; --gold-soft:#f8ecd6; --bad:#b0402d; --bad-soft:#f7e2dd;
+  --asset:#6046ad; --asset-soft:#ece7f8; --op:#1b649e; --op-soft:#e2eef8;
+  --f:"Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --m:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1412; --surface:#151d1a; --surface2:#1b2521; --ink:#e5eee9; --muted:#8e9e98; --line:#26312d;
+  --value:#3ccb9c; --value-soft:#143328; --gold:#e6b452; --gold-soft:#372a12; --bad:#f2907d; --bad-soft:#3a1d18;
+  --asset:#b9a5f5; --asset-soft:#251f3c; --op:#72b8ec; --op-soft:#132a3c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1412; --surface:#151d1a; --surface2:#1b2521; --ink:#e5eee9; --muted:#8e9e98; --line:#26312d;
+  --value:#3ccb9c; --value-soft:#143328; --gold:#e6b452; --gold-soft:#372a12; --bad:#f2907d; --bad-soft:#3a1d18;
+  --asset:#b9a5f5; --asset-soft:#251f3c; --op:#72b8ec; --op-soft:#132a3c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.wrap{max-width:720px;margin:0 auto;padding-block:14px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-direction:column;gap:4px}
+.eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--value)}
+h1{margin:0;font-size:1.6rem;font-weight:800;letter-spacing:-.01em;text-wrap:balance}
+.stamp{color:var(--muted);font-size:.84rem}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:6px;display:flex;gap:6px}
+.tabs button{flex:1;min-width:0;font:inherit;font-weight:600;font-size:.84rem;padding:9px 4px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,.row:focus-visible{outline:2px solid var(--value);outline-offset:2px}
+.sec{display:flex;flex-direction:column;gap:8px}
+.sechead{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.sechead h2{margin:0;font-size:1rem;font-weight:700}
+.sechead span{color:var(--muted);font-size:.8rem}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.row{display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 12px;border-top:1px solid var(--line);cursor:pointer;background:none;width:100%;text-align:left;font:inherit;color:inherit;border-left:0;border-right:0;border-bottom:0}
+.row:first-child{border-top:0}
+.row:hover{background:var(--surface2)}
+.row.dim{opacity:.62}
+.rk{font-family:var(--m);font-size:.78rem;color:var(--muted);text-align:right}
+.who{min-width:0;display:flex;flex-direction:column;gap:2px}
+.tkline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tk{font-weight:800;font-size:1.02rem;letter-spacing:.02em}
+.co{color:var(--muted);font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{font-size:.66rem;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.chip.a{background:var(--asset-soft);color:var(--asset)}.chip.o{background:var(--op-soft);color:var(--op)}
+.chip.pick{background:var(--gold-soft);color:var(--gold)}.chip.warn{background:var(--gold-soft);color:var(--gold)}.chip.red{background:var(--bad);color:var(--surface)}
+.qc{border-radius:12px;padding:12px 14px;border:1px solid var(--line);background:var(--surface)}.qc h3{margin:0 0 8px;font-size:1rem}.qc.bad{border-color:var(--bad);background:var(--bad-soft)}.qc.mid{border-color:var(--gold)}.qc.ok h3{color:var(--value)}.qc ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}.qc li{line-height:1.45;font-size:.9rem}.qc li.r b{color:var(--bad)}.qc li.y b{color:var(--gold)}.qc p{margin:0;font-size:.86rem;color:var(--muted)}
+.nums{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-family:var(--m);font-variant-numeric:tabular-nums}
+.pv{font-size:.82rem;white-space:nowrap}.pv b{font-weight:700}
+.pot{font-size:.74rem;font-weight:700;padding:1px 7px;border-radius:6px;background:var(--value-soft);color:var(--value)}
+.pot.neg{background:var(--bad-soft);color:var(--bad)}
+.tools{display:flex;flex-direction:column;gap:8px}
+.tools input{font:inherit;font-size:1rem;padding:11px 13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100%}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{font:inherit;font-size:.82rem;font-weight:600;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.filters button[aria-pressed="true"]{border-color:var(--value);background:var(--value-soft);color:var(--value)}
+.count{color:var(--muted);font-size:.8rem}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;font-size:.88rem;color:var(--muted)}
+.note b{color:var(--ink)}
+.empty{padding:22px 14px;text-align:center;color:var(--muted)}
+footer{color:var(--muted);font-size:.74rem}
+/* portfolio */
+.chip.own{background:var(--value-soft);color:var(--value)}
+.pf{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.pf h3{margin:0;font-size:1rem}
+.pf .meta{font-size:.86rem;color:var(--muted)}
+.pf .meta b{color:var(--ink);font-family:var(--m);font-variant-numeric:tabular-nums}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:700;font-size:.92rem;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.pri{background:var(--value);border-color:var(--value);color:var(--surface)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.wide{width:100%}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.form label:last-child{grid-column:1/-1}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;min-width:0}
+.form input{font:inherit;font-family:var(--m);font-size:.95rem;padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;min-width:0;text-transform:none}
+.sum{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sum /*x*/.cell b.up{color:var(--value)}.sum .cell b.down{color:var(--bad)}
+.pfrow{grid-template-columns:minmax(0,1fr) auto}.pfrow .co{white-space:normal}
+.hint{font-size:.78rem;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:.88rem;font-weight:600;z-index:60;max-width:calc(100% - 32px)}
+/* detail sheet */
+.sheet{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;transform:translateX(100%);transition:transform .22s ease;padding-top:env(safe-area-inset-top,0px)}
+.sheet.open{transform:none}
+@media (prefers-reduced-motion: reduce){.sheet{transition:none}}
+.bar{position:sticky;top:0;z-index:2;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.back{font:inherit;font-weight:600;font-size:.92rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 12px;cursor:pointer}
+.bar .t{font-weight:800}
+.d{max-width:720px;margin:0 auto;padding-block:16px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.dh{display:flex;flex-direction:column;gap:6px}
+.dh .big{font-size:2rem;font-weight:800;letter-spacing:.01em;line-height:1.05}
+.dh .co{white-space:normal;font-size:.88rem}
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cell{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 10px;min-width:0}
+.cell span{display:block;font-size:.7rem;color:var(--muted);font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+.cell b{display:block;font-family:var(--m);font-size:1.08rem;font-variant-numeric:tabular-nums;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell.v b{color:var(--value)}
+.scale{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 12px 10px}
+.track{position:relative;height:10px;border-radius:999px;background:var(--surface2);margin:30px 6px 30px}
+.fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--value-soft)}
+.mk{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;border:3px solid var(--surface)}
+.mk.p{background:var(--ink)}.mk.n{background:var(--gold)}.mk.v{background:var(--value)}
+.lab{position:absolute;transform:translateX(-50%);font-family:var(--m);font-size:.7rem;white-space:nowrap;color:var(--muted)}
+.lab.up{bottom:16px}.lab.dn{top:16px}
+.lab b{color:var(--ink)}
+.scale p{margin:0;font-size:.78rem;color:var(--muted)}
+.why h3,.calc h3,.risk h3,.src h3{margin:0 0 8px;font-size:1.02rem;font-weight:700}
+.lead{font-size:1.02rem;line-height:1.5;margin:0 0 10px;text-wrap:pretty}
+.why ul,.risk ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:8px}
+.why li,.risk li{line-height:1.5}
+.num{font-family:var(--m);font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.calc table{width:100%;border-collapse:collapse;font-size:.88rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.calc td{padding:8px 10px;border-top:1px solid var(--line)}
+.calc tr:first-child td{border-top:0}
+.calc td:last-child{text-align:right;font-family:var(--m);font-variant-numeric:tabular-nums;white-space:nowrap}
+.calc tr.tot td{font-weight:700;background:var(--value-soft);color:var(--value)}
+.risk li.w{color:var(--bad)}
+.src a{color:var(--op);word-break:break-all;font-size:.84rem}
+.src p{margin:0 0 6px;font-size:.84rem;color:var(--muted)}
+</style>
+
+<div class="wrap" lang="tr">
+  <header>
+    <span class="eyebrow">MK Hisseler · MK Final 1.4</span>
+    <h1>Hisselerin değeri</h1>
+    <span class="stamp" id="stamp">Yükleniyor…</span>
+  </header>
+  <nav class="tabs" role="tablist">
+    <button role="tab" id="tab-top" data-tab="top" aria-selected="true">İlk 30</button>
+    <button role="tab" id="tab-all" data-tab="all" aria-selected="false">Tümü</button>
+    <button role="tab" id="tab-pf" data-tab="pf" aria-selected="false">Portföyüm</button>
+    <button role="tab" id="tab-how" data-tab="how" aria-selected="false">Sistem</button>
+  </nav>
+  <main id="view"></main>
+  <footer>MK Final 1.4, açıklanmış finansal veriler ve belirli varsayımlarla araştırma amaçlı değer senaryoları üretir. Gösterilen model değeri ve potansiyel, 12 ay içinde gerçekleşmesi beklenen veya garanti edilen getiri değildir. Pay sayısı, sermaye işlemleri, konsolidasyon, enflasyon muhasebesi ve şirket olaylarındaki eksikler sonucu önemli ölçüde değiştirebilir; kırmızı bayrak bulunmaması şirketin risksiz olduğunu göstermez. Geçmiş testlerde sağ kalan şirket yanlılığı, tarihsel ortaklık bilgisi eksikliği ve geçmiş sonuçlar görülerek geliştirilmiş kurallar vardır; sonuçlar bağımsız olarak doğrulanmamıştır. Yatırım tavsiyesi değildir.</footer>
+</div>
+
+<section class="sheet" id="sheet" aria-hidden="true" lang="tr">
+  <div class="bar"><div class="in"><button class="back" id="back">← Liste</button><span class="t" id="sheetT"></span></div></div>
+  <div class="d" id="detail"></div>
+</section>
+
+<script type="application/json" id="embedded">__DATA__</script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const TR = new Intl.NumberFormat('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const fx = v => v == null || !isFinite(v) ? '—' : TR.format(v);
+const pct = v => v == null || !isFinite(v) ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + '%' + new Intl.NumberFormat('tr-TR', {maximumFractionDigits: 0}).format(Math.abs(100 * v));
+const pc0 = v => v == null || !isFinite(v) ? '—' : '%' + new Intl.NumberFormat('tr-TR', {maximumFractionDigits: v < 0.1 ? 1 : 0}).format(100 * v);
+const x2 = v => v == null || !isFinite(v) ? '—' : new Intl.NumberFormat('tr-TR', {maximumFractionDigits: 1, minimumFractionDigits: 1}).format(v);
+function tl(v) {
+  if (v == null || !isFinite(v)) return '—';
+  const a = Math.abs(v), s = v < 0 ? '−' : '';
+  const f = (n, u) => s + new Intl.NumberFormat('tr-TR', {maximumFractionDigits: n >= 100 ? 0 : n >= 10 ? 1 : 2}).format(n) + ' ' + u;
+  if (a >= 1e12) return f(a / 1e12, 'trilyon TL');
+  if (a >= 1e9) return f(a / 1e9, 'milyar TL');
+  if (a >= 1e6) return f(a / 1e6, 'milyon TL');
+  return s + new Intl.NumberFormat('tr-TR', {maximumFractionDigits: 0}).format(a) + ' TL';
+}
+const N = v => `<span class="num">${tl(v)}</span>`;
+const DATE = s => { if (!s) return '—'; const d = new Date(s.slice(0, 10) + 'T12:00:00'); return isNaN(d) ? s : d.toLocaleDateString('tr-TR', {day: 'numeric', month: 'long', year: 'numeric'}); };
+
+let D = null, ALL = [], PICKS = new Set(), tab = 'top', filt = 'all', query = '';
+
+function prep(d) {
+  D = d; PICKS = new Set(d.picks.map(p => p.ticker));
+  ALL = [...d.asset, ...d.operating].sort((a, b) => b.potential - a.potential);
+}
+
+function row(x, rank) {
+  const a = x.group === 'VARLIK', pk = PICKS.has(x.ticker);
+  const tags = [`<span class="chip ${a ? 'a' : 'o'}">${a ? 'VARLIK' : 'FAALİYET'}</span>`];
+  if (PF.items[x.ticker]) tags.push('<span class="chip own">PORTFÖYDE</span>');
+  if (pk) tags.push('<span class="chip pick">SİSTEM SEÇİMİ</span>');
+  const ql = (x.quality || {}).level;
+  if (ql === 'KIRMIZI') tags.push('<span class="chip red">KIRMIZI BAYRAK</span>');
+  else if (!x.eligible && x.potential > 0) tags.push('<span class="chip warn">HACİM DÜŞÜK</span>');
+  else if (ql === 'SARI' || (x.warnings || []).length) tags.push('<span class="chip warn">KONTROL ET</span>');
+  return `<button class="row${x.eligible || x.potential <= 0 ? '' : ' dim'}" data-t="${esc(x.ticker)}">
+    <span class="rk">${rank}</span>
+    <span class="who"><span class="tkline"><span class="tk">${esc(x.ticker)}</span>${tags.join('')}</span><span class="co">${esc(x.company)}</span></span>
+    <span class="nums"><span class="pv">${fx(x.price)} → <b>${fx(x.value_ps)}</b></span><span class="pot${x.potential < 0 ? ' neg' : ''}">${pct(x.potential)}</span></span>
+  </button>`;
+}
+
+function viewTop() {
+  const A = D.asset.filter(x => x.eligible).slice(0, 15), O = D.operating.filter(x => x.eligible).slice(0, 15);
+  return `<div class="note">Her satırda <b>fiyat → değer</b> ve aradaki fark var. Hisseye dokunun, <b>neden ucuz olduğu</b> adım adım açılır. Sarı etiketli 5 hisse (3 varlık + 2 faaliyet, aynı gruptan en fazla 1) sistemin bu haftaki seçimi. Her hisse otomatik kalite kontrolünden geçer; kırmızı bayraklılar listenin altında, nedeniyle.</div>
+  <section class="sec"><div class="sechead"><h2>Varlık şirketleri</h2><span>GYO, holding, gayrimenkulü çok olanlar · özkaynağına göre en ucuz 15</span></div>
+    <div class="list">${A.map((x, i) => row(x, i + 1)).join('')}</div></section>
+  <section class="sec"><div class="sechead"><h2>Faaliyet şirketleri</h2><span>Diğer tüm şirketler · kârına göre en ucuz 15</span></div>
+    <div class="list">${O.map((x, i) => row(x, i + 1)).join('')}</div></section>
+  ${redSection()}`;
+}
+function redSection() {
+  const R = ALL.filter(x => (x.quality || {}).level === 'KIRMIZI' && x.potential > 1).slice(0, 15);
+  if (!R.length) return '';
+  return `<section class="sec"><div class="sechead"><h2>Kırmızı bayrak: ucuz görünüp seçilmeyenler</h2><span>Kalite kontrolünden geçemedi (kayyım/TMSF, SPK, konkordato, bilanço sonrası bedelli, şişirilmiş özkaynak, art arda taban…). Dokunun, nedeni yazar.</span></div>
+    <div class="list">${R.map((x, i) => row(x, '⛔')).join('')}</div></section>`;
+}
+
+function viewAll() {
+  return `<div class="tools"><input id="q" type="search" placeholder="Hisse kodu veya şirket adı: THYAO, Aselsan…" autocomplete="off" value="${esc(query)}" aria-label="Hisse ara">
+    <div class="filters" id="filters">${[['all', 'Hepsi'], ['V', 'Varlık'], ['F', 'Faaliyet'], ['cheap', 'Ucuz'], ['exp', 'Pahalı']].map(([k, l]) => `<button data-f="${k}" aria-pressed="${filt === k}">${l}</button>`).join('')}</div>
+    <span class="count" id="count"></span></div>
+    <div class="list" id="alllist"></div>`;
+}
+function fillAll() {
+  const q = query.trim().toLocaleUpperCase('tr-TR');
+  const rows = ALL.filter(x => (filt === 'all' || (filt === 'V' && x.group === 'VARLIK') || (filt === 'F' && x.group !== 'VARLIK') || (filt === 'cheap' && x.potential > 0) || (filt === 'exp' && x.potential <= 0))
+    && (!q || x.ticker.includes(q) || x.company.toLocaleUpperCase('tr-TR').includes(q)));
+  $('#count').textContent = `${rows.length} hisse · değer farkına göre sıralı (en ucuz üstte)`;
+  $('#alllist').innerHTML = rows.length ? rows.map((x, i) => row(x, ALL.indexOf(x) + 1)).join('')
+    : `<div class="empty">“${esc(query)}” bu taramada yok. Bilançosu eksik, döviz bazlı ya da son 20 günde işlem görmemiş olabilir.</div>`;
+}
+
+function viewHow() {
+  return `<section class="sec"><div class="note"><b>Her şirket, değerinin durduğu yerden ölçülür.</b><br><br>
+  <b>Varlık şirketleri</b> (GYO, holding ya da varlığının en az %30'u gayrimenkul olanlar): değer = özkaynak + bağlı GYO'larının ekspertiz farkı. Borsa değeri bu değere göre en düşük olanlar ucuzdur. Pabrai'nin Reysaş hesabı budur.<br><br>
+  <b>Faaliyet şirketleri</b>: değer = 16 × gelecek yıl net kârı. Kâr tahmin edilemeyen (zarar eden, finans) şirketlerde özkaynak + kârlılık yöntemi kullanılır.<br><br>
+  <b>Kural:</b> varlık grubundan en ucuz 3 + faaliyet grubundan en ucuz 2 = 5 hisse, eşit para. Önerilen kullanım: parayı 4'e bölüp her çeyrek (Ocak, Nisan, Temmuz, Ekim) o haftanın 5 hissesine bir dilim yatırmak; satış zamanı sizin kararınız. Günlük işlemi 20 bin $ altındaki ve kırmızı bayraklı hisse seçilmez.<br><br>
+  <b>Model değerine göre fark</b> = model değeri / fiyat − 1. Beklenen getiri veya gerçekleşme olasılığı değildir; gerçekleşme süresi belirsizdir ve model değeri düşebilir. Hedef fiyat verilmez; ne zaman satacağınız size kalmış.</div>
+  <div class="note"><b>Geriye dönük test — MK Final 1.4 (final)</b>: 3 varlık + 2 faaliyet; gizli değer sıralamada değil (ek senaryo); kırmızı bayraklı hisse yok; aynı gruptan tek hisse; pay sayısı doğrulanamayan adımda en yüksek piyasa değeri varsayılır (hisse ancak öyle de ucuzsa seçilir); seçim günün kapanışından sonra, alım ertesi gün.<br>
+  12 ay tutma, başlangıç ayına göre 7 yıl: Nisan <b>418 kat</b> · Ocak 225 · Temmuz 128 · Ekim 65 (4 dilim ortalaması ≈ 209) — XU100 13-15 kat. Yıl içi en kötü düşüş −%53.<br>
+  <b>Değerine gelince satıp parayı haftanın yeni hissesine yatırmak</b>: Nisan 250 · Ocak 156 · Temmuz 96 · Ekim 50 kat (ort. ≈ 138). Her başlangıç ayında 12 ay tutmaktan düşük: getirinin büyük kısmı model değerini aşıp yükselmeye devam eden hisselerden geldi.<br>
+  Bu sonuçlar <b>doğrulanmış başarı değildir</b>: 3+2 yapısı geçmiş sonuçlar görülerek seçildi; aynı evrenden rastgele 10 hisse bile bu dönemde 28-56 kat yaptı (küçük/orta hisse ve ucuzluk etkisi); 5 hisse ciddi düşüş yaşayabilir. Bundan sonrası kurallar değiştirilmeden sanal takiple izlenir; eski 10 hisselik liste ve basit en düşük PD/DD listesi de karşılaştırma için kaydedilir.</section>`;
+}
+
+
+/* ---------- portfolio store: account (claude db) when available, else this device ---------- */
+const LKEY = 'mk_portfolio_v1';
+const PF = {mode: 'local', items: {}, col: null};
+function loadLocal() { try { return JSON.parse(localStorage.getItem(LKEY) || '{}') || {}; } catch (e) { return {}; } }
+function saveLocal() { try { localStorage.setItem(LKEY, JSON.stringify(PF.items)); } catch (e) { } }
+PF.items = loadLocal();
+const TG = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) ? window.Telegram.WebApp : null;
+function tgCall(fn, ...args) { return new Promise((res, rej) => { try { TG.CloudStorage[fn](...args, (err, val) => err ? rej(err) : res(val)); } catch (e) { rej(e); } }); }
+async function pfInit() {
+  if (TG && TG.CloudStorage) {
+    // Telegram içinde: portföy Telegram hesabınızda (CloudStorage) saklanır, telefon/bilgisayar arasında eşitlenir
+    try {
+      const keys = (await tgCall('getKeys')).filter(k => k.startsWith('pf_'));
+      const vals = keys.length ? await tgCall('getItems', keys) : {};
+      const items = {};
+      for (const k of keys) { try { const v = JSON.parse(vals[k]); if (v && v.ticker) items[v.ticker] = v; } catch (e) { } }
+      for (const [t, it] of Object.entries(PF.items)) if (!items[t]) { items[t] = it; tgCall('setItem', 'pf_' + t, JSON.stringify(it)).catch(() => { }); }
+      PF.items = items; PF.mode = 'telegram'; try { localStorage.removeItem(LKEY); } catch (e) { }
+      pfChanged();
+    } catch (e) { }
+    return;
+  }
+  if (!window.claude || typeof window.claude.use !== 'function') return;
+  try {
+    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    const uid = user ? await user.id() : null;
+    if (!db || !uid) return;
+    PF.col = db.doc('data/users/' + uid + '/portfolio').collection('items');
+    let first = true;
+    PF.col.onSnapshot(snap => {
+      const cloud = {}; snap.docs.forEach(d => { if (d.exists) cloud[d.id] = d.data(); });
+      if (first) {
+        first = false; PF.mode = 'cloud';
+        for (const [t, it] of Object.entries(PF.items)) if (!cloud[t]) { cloud[t] = it; PF.col.doc(t).set(it).catch(() => { }); }
+        try { localStorage.removeItem(LKEY); } catch (e) { }
+      }
+      PF.items = cloud; pfChanged();
+    }, () => { PF.mode = 'local'; PF.col = null; });
+  } catch (e) { }
+}
+async function pfSave(t, it) {
+  PF.items[t] = it; pfChanged();
+  if (PF.mode === 'telegram') { try { await tgCall('setItem', 'pf_' + t, JSON.stringify(it)); } catch (e) { toast('Telegram’a kaydedilemedi, bu cihazda tutuluyor.'); saveLocal(); } }
+  else if (PF.mode === 'cloud' && PF.col) { try { await PF.col.doc(t).set(it); } catch (e) { toast('Hesaba kaydedilemedi, bu cihazda tutuluyor.'); PF.mode = 'local'; saveLocal(); } }
+  else saveLocal();
+}
+async function pfRemove(t) {
+  delete PF.items[t]; pfChanged();
+  if (PF.mode === 'telegram') { try { await tgCall('removeItem', 'pf_' + t); } catch (e) { toast('Silinemedi, tekrar deneyin.'); } }
+  else if (PF.mode === 'cloud' && PF.col) { try { await PF.col.doc(t).delete(); } catch (e) { toast('Silinemedi, tekrar deneyin.'); } }
+  else saveLocal();
+}
+function pfChanged() {
+  if (tab === 'pf') render(); else if (tab === 'top') render(); else if (tab === 'all' && $('#alllist')) fillAll();
+  const open = $('#sheet').classList.contains('open') && $('#sheetT').textContent;
+  if (open && $('#pfbox')) $('#pfbox').outerHTML = pfBlock(ALL.find(r => r.ticker === open) || {ticker: open});
+}
+let toastTimer = null;
+function toast(msg) {
+  let el = $('#toast'); if (!el) { el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+  el.textContent = msg; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 2600);
+}
+const num = s => { const v = parseFloat(String(s).trim().replace(/\./g, '').replace(',', '.')); return isFinite(v) ? v : NaN; };
+const numIn = s => { const t = String(s).trim(); return parseFloat(t.includes(',') ? t.replace(/\./g, '').replace(',', '.') : t); };
+const today = () => new Date().toISOString().slice(0, 10);
+const addYear = d => { const x = new Date(d + 'T12:00:00'); x.setFullYear(x.getFullYear() + 1); return x.toISOString().slice(0, 10); };
+
+function pfBlock(x, editing = false) {
+  const t = x.ticker, it = PF.items[t];
+  const where = PF.mode === 'telegram' ? 'Telegram hesabınıza kaydedilir; tüm cihazlarınızda görünür.' : PF.mode === 'cloud' ? 'Hesabınıza kaydedilir, yalnız siz görürsünüz.' : 'Bu cihazda saklanır.';
+  if (it && !editing) {
+    const cur = x.price, ret = cur ? cur / it.price - 1 : null;
+    return `<section class="pf" id="pfbox"><h3>Portföyünüzde</h3>
+      <div class="meta"><b>${new Intl.NumberFormat('tr-TR').format(it.qty)}</b> adet · alış <b>${fx(it.price)}</b> · ${DATE(it.date)}<br>
+      Şimdi <b>${fx(cur)}</b> · ${ret == null ? '' : `<b class="${ret >= 0 ? 'up' : 'down'}">${pct(ret)}</b> · `}12 ay doluyor: <b>${DATE(addYear(it.date))}</b></div>
+      <div class="btns" id="pfact"><button class="btn" data-pf="edit" data-t="${esc(t)}">Düzenle</button><button class="btn danger" data-pf="ask" data-t="${esc(t)}">Portföyden çıkar</button></div></section>`;
+  }
+  if (!editing) return `<section class="pf" id="pfbox"><button class="btn pri wide" data-pf="form" data-t="${esc(t)}">＋ Portföye ekle</button><span class="hint">${where}</span></section>`;
+  const v = it || {price: x.price, qty: '', date: today()};
+  return `<section class="pf" id="pfbox"><h3>${it ? 'Pozisyonu düzenle' : 'Portföye ekle'}</h3>
+    <form id="pfform" data-t="${esc(t)}" class="form" novalidate>
+      <label>Alış fiyatı<input id="pf-price" inputmode="decimal" value="${v.price != null ? TR.format(v.price) : ''}" required></label>
+      <label>Adet<input id="pf-qty" inputmode="numeric" value="${v.qty}" placeholder="örn. 1000" required></label>
+      <label>Alış tarihi<input id="pf-date" type="date" value="${esc(v.date)}" max="${today()}" required></label>
+    </form>
+    <span class="hint" id="pf-err">${where} Model değeri, ekleme anındaki taramayla birlikte saklanır.</span>
+    <div class="btns"><button class="btn pri" data-pf="save" data-t="${esc(t)}">${it ? 'Kaydet' : 'Ekle'}</button><button class="btn" data-pf="cancel" data-t="${esc(t)}">Vazgeç</button></div></section>`;
+}
+function pfSubmit(t) {
+  const x = ALL.find(r => r.ticker === t) || {};
+  const price = numIn($('#pf-price').value), qty = num($('#pf-qty').value), date = $('#pf-date').value;
+  if (!(price > 0)) { $('#pf-err').textContent = 'Alış fiyatını yazın (örn. 4,41).'; return; }
+  if (!(qty > 0)) { $('#pf-err').textContent = 'Kaç adet aldığınızı yazın.'; return; }
+  if (!date) { $('#pf-err').textContent = 'Alış tarihini seçin.'; return; }
+  const old = PF.items[t] || {};
+  pfSave(t, {ticker: t, price, qty, date, company: x.company || old.company || t, group: x.group || old.group || '',
+    net_target: old.net_target ?? x.net_target ?? null, value_ps: old.value_ps ?? x.value_ps ?? null, scan: old.scan || (D && D.asof) || null});
+  toast(old.price ? `${t} güncellendi` : `${t} portföye eklendi`);
+}
+
+function viewPf() {
+  const items = Object.values(PF.items).sort((a, b) => a.date < b.date ? 1 : -1);
+  const where = PF.mode === 'telegram' ? 'Portföy Telegram hesabınıza kaydedilir; tüm cihazlarınızda görünür.' : PF.mode === 'cloud' ? 'Portföy hesabınıza kaydedilir; yalnız siz görürsünüz.' : 'Portföy bu cihazda saklanır.';
+  if (!items.length) return `<div class="note"><b>Portföyünüz boş.</b><br>Listeden bir hisseye dokunun, açılan sayfada <b>＋ Portföye ekle</b> ile alış fiyatı ve adedi girin. Burada kâr/zarar, model değerine göre fark ve 12 ayın dolacağı tarih görünür.<br><br>${where}</div>`;
+  let cost = 0, val = 0;
+  const rows = items.map(it => {
+    const x = ALL.find(r => r.ticker === it.ticker), cur = x ? x.price : null;
+    cost += it.price * it.qty; val += (cur ?? it.price) * it.qty;
+    const ret = cur ? cur / it.price - 1 : null, mv = x ? x.value_ps : it.value_ps, hit = mv && cur && cur >= mv;
+    const toNet = mv && cur ? mv / cur - 1 : null;
+    return `<button class="row pfrow" data-t="${esc(it.ticker)}">
+      <span class="who"><span class="tkline"><span class="tk">${esc(it.ticker)}</span>${it.group ? `<span class="chip ${it.group === 'VARLIK' ? 'a' : 'o'}">${it.group}</span>` : ''}${hit ? '<span class="chip pick">FİYAT MODEL DEĞERİNİN ÜSTÜNDE</span>' : ''}</span>
+      <span class="co">${new Intl.NumberFormat('tr-TR').format(it.qty)} adet × ${fx(it.price)} · ${DATE(it.date)} · 12 ay: ${DATE(addYear(it.date))}${toNet != null && !hit ? ` · model değerine fark ${pct(toNet)}` : ''}</span></span>
+      <span class="nums"><span class="pv">${fx(cur)}</span><span class="pot${ret != null && ret < 0 ? ' neg' : ''}">${pct(ret)}</span></span></button>`;
+  }).join('');
+  const pl = val - cost;
+  return `<div class="sum"><div class="cell"><span>Maliyet</span><b>${tl(cost)}</b></div><div class="cell"><span>Bugünkü değer</span><b>${tl(val)}</b></div>
+    <div class="cell"><span>Kâr / zarar</span><b class="${pl >= 0 ? 'up' : 'down'}">${tl(pl)}</b></div><div class="cell"><span>Getiri</span><b class="${pl >= 0 ? 'up' : 'down'}">${pct(cost ? pl / cost : null)}</b></div></div>
+    <div class="list">${rows}</div>
+    <span class="hint">Fiyatlar ${DATE(D && D.asof)} kapanışı. Kalan fark, bu haftanın model değerine göre. ${where}</span>`;
+}
+
+/* ---------- plain-language explanation ---------- */
+function explain(x) {
+  const d = x.detail || {}, out = {lead: '', why: [], calc: [], risk: []};
+  x = Object.assign({}, x, {value_total: x.value_total ?? d.value_total});
+  const name = x.ticker;
+  if (x.group === 'VARLIK') {
+    const ratio = d.mcap / x.value_total;
+    out.lead = `Borsada ${N(d.mcap)} ediyor. Sistemin hesapladığı net varlık değeri ${N(x.value_total)}. Piyasa, şirketin net varlığının yalnızca <span class="num">${pc0(ratio)}</span> kadarını fiyatlıyor.`;
+    if (x.type === 'holding') out.why.push(`<b>Holding.</b> Değeri kârından değil, iştiraklerindeki paylardan ve elindeki varlıklardan geliyor. Bu yüzden özkaynağıyla ölçülüyor.`);
+    else if (x.type === 'gyo') out.why.push(`<b>Gayrimenkul yatırım ortaklığı.</b> Portföyündeki gayrimenkuller her yıl bağımsız ekspertizle değerleniyor ve bilançoya bu değerle giriyor. Bu yüzden özkaynağı, elindeki malın bugünkü değerine yakın.`);
+    else out.why.push(`<b>Varlığının <span class="num">${pc0(d.real_estate_share)}</span> kadarı gayrimenkul</b> (yatırım amaçlı gayrimenkul, arsa, bina). Böyle şirketlerde değeri kârdan çok elindeki mal belirler.`);
+    out.why.push(`Toplam varlığı ${N(d.total_assets)}. Bütün borçlar düşülünce ana ortaklığa ${N(d.equity)} özkaynak kalıyor.`);
+    if (d.capital_advance > 0) out.why.push(`<b>Sermaye avansı düşüldü:</b> özkaynağın ${N(d.capital_advance)} kısmı henüz pay olarak tescil edilmemiş sermaye avansı. Bu para ya yeni paylara dönüşür (mevcut hissedarın payı sulanır) ya da iade edilir; bu yüzden değere katılmadı.`);
+    if (d.hidden > 0) out.why.push(`<b>Ek senaryo (doğrulanmamış, sıralamaya katılmadı):</b> bağlı ortaklığı ${esc((x.hidden_from || []).join(', '))} gayrimenkullerini ekspertiz değeriyle gösteriyor; basit formülle payına düşen fark ${N(d.hidden)}. Bu fark taşınmaz bazında doğrulanmadığı için değere eklenmedi. Eklenirse hisse başı <span class="num">${fx(d.hidden_scenario_ps)} TL</span> olurdu (Reysaş tipi aday — KAP'tan ekspertiz raporlarını kontrol edin).`);
+    out.why.push(`Hisse başına değer <span class="num">${fx(x.value_ps)} TL</span>, bugünkü fiyat <span class="num">${fx(x.price)} TL</span>. Model değerine göre fark <span class="num">${pct(x.potential)}</span> (beklenen getiri değildir).`);
+    out.calc = [['Toplam varlık', tl(d.total_assets)], ['Özkaynak (ana ortaklık)', tl(d.equity)]];
+    if (d.capital_advance > 0) out.calc.push(['Sermaye avansı (düşüldü)', '− ' + tl(d.capital_advance)]);
+    if (d.hidden > 0) out.calc.push([`Ek senaryo: gizli değer (${(x.hidden_from || []).join(', ')}) — sıralamada yok`, '(+ ' + tl(d.hidden) + ')']);
+    out.calc.push(['Değer', tl(x.value_total), 1], ['Borsa değeri', tl(d.mcap)], ['Borsa değeri / değer', x2(ratio)]);
+    out.risk.push('Özkaynak, 2023 sonundan beri enflasyon muhasebesiyle (TMS 29) yeniden değerleniyor. Bu, varlıkları olduğundan yüksek gösterebilir.');
+    out.risk.push('Varlık değeri ancak satılırsa, kiraya ya da kâra dönüşürse fiyata yansır. Bu tip hisseler yıllarca ucuz kalabilir; sistem bu yüzden 12 ay bekler.');
+    if (x.type === 'holding') out.risk.push('Holding özkaynağında iştirakler maliyet ya da bilanço değeriyle durur; borsadaki iştiraklerin bugünkü değerine KAP\'tan bakın.');
+    if (d.hidden > 0) out.risk.push('Ortaklık oranı bugünkü KAP ortaklık tablosundan alındı.');
+  } else if (String(d.engine || '').startsWith('MK-FINAL')) {
+    const pe = d.ttm_profit > 0 ? d.mcap / d.ttm_profit : null, fpe = d.forward_profit > 0 ? d.mcap / d.forward_profit : null;
+    const gr = d.ttm_revenue_prior ? d.ttm_revenue / d.ttm_revenue_prior - 1 : null;
+    out.lead = d.ttm_profit > 0
+      ? `Son 12 ayda ${N(d.ttm_profit)} net kâr etti, borsa değeri ${N(d.mcap)} (F/K <span class="num">${x2(pe)}</span>). Sistem gelecek yıl kârını ${N(d.forward_profit)} hesaplıyor; bunun 16 katı ${N(x.value_total)} eder.`
+      : `Son 12 ayda net kârı ${N(d.ttm_profit)}, borsa değeri ${N(d.mcap)}. Sistem gelecek yıl kârını ${N(d.forward_profit)} hesaplıyor; bunun 16 katı ${N(x.value_total)} eder.`;
+    out.why.push(`<b>Ciro:</b> son 12 ayda ${N(d.ttm_revenue)}${d.ttm_revenue_prior ? `, bir önceki 12 ayda ${N(d.ttm_revenue_prior)} (<span class="num">${pct(gr)}</span>)` : ''}.`);
+    out.why.push(`<b>Gelecek yıl:</b> geçen yılki büyümenin yarısı varsayıldı (<span class="num">${pct(d.growth)}</span>), ciro ${N(d.next_revenue)}.`);
+    out.why.push(`<b>Kâr:</b> son 12 ayın brüt kâr marjı (<span class="num">${pc0(d.gross_margin)}</span>) korunur, giderler cironun yarısı hızında artar. Esas faaliyet kârı ${N(d.next_operating)}. Finansman ${N(d.finance_net)} eklenir, finansal gelirler sayılmaz, %25 vergi düşülür. Gelecek yıl net kâr ${N(d.forward_profit)}.`);
+    out.why.push(`<b>Değer:</b> bu kâr 16 ile çarpıldı (F/K 16). Şirket değeri ${N(x.value_total)}, hisse başı <span class="num">${fx(x.value_ps)} TL</span>. Bugün ileri F/K <span class="num">${x2(fpe)}</span>.`);
+    if (d.bear && d.bull) out.why.push(`Kötümser senaryoda (daha az büyüme, F/K 12) <span class="num">${fx(d.bear * (d.price_factor || 1))} TL</span>, iyimser senaryoda <span class="num">${fx(d.bull * (d.price_factor || 1))} TL</span>.`);
+    out.calc = [['Son 12 ay ciro', tl(d.ttm_revenue)], ['Son 12 ay net kâr', tl(d.ttm_profit)], ['Gelecek yıl ciro', tl(d.next_revenue)], ['Gelecek yıl faaliyet kârı', tl(d.next_operating)],
+      ['Finansman (net)', tl(d.finance_net)], ['Gelecek yıl net kâr', tl(d.forward_profit)], ['× 16 = değer', tl(x.value_total), 1], ['Borsa değeri', tl(d.mcap)]];
+    out.risk.push('Hesap geçen yılın büyümesinin yarısının süreceğini varsayar. Büyüme tek seferlikse (büyük ihale, kur farkı, varlık satışı) değer olduğundan yüksek çıkar.');
+    if (gr != null && gr > 1) out.risk.push(`Ciro bir yılda ${pct(gr)} değişti; bu hızın kaynağını KAP'tan kontrol edin.`);
+  } else {
+    const fin = String(d.engine || '').includes('FINANCIAL');
+    const pb = d.ri_book > 0 ? d.mcap / d.ri_book : null;
+    out.lead = `Borsa değeri ${N(d.mcap)}, özkaynağı ${N(d.ri_book)} (PD/DD <span class="num">${x2(pb)}</span>). Kârlılığı normale dönerse sistemin değeri ${N(x.value_total)}.`;
+    out.why.push(fin ? `<b>Finans şirketi.</b> Ciro ve brüt marj bu şirketlerde anlamlı değil. Değer özkaynaktan ve özkaynak kârlılığından hesaplanır.`
+      : `<b>Gelecek yıl kârı tahmin edilemedi</b> (kâr düşük ya da zarar). Bu durumda MK Final 1.0'ın yedek yöntemi kullanılır: özkaynak + gelecekteki fazla kâr.`);
+    if (d.ttm_profit != null) out.why.push(`Son 12 ay net kâr ${N(d.ttm_profit)}${d.ttm_profit_prior != null ? `, bir önceki 12 ay ${N(d.ttm_profit_prior)}` : ''}.`);
+    out.why.push(`Son yıllık özkaynak kârlılığı (ROE) <span class="num">${pc0(d.roe)}</span>. Sistem bunu 5 yılda sermaye maliyeti olan <span class="num">${pc0(d.ke)}</span> seviyesine yaklaştırıyor.`);
+    out.why.push(d.roe < d.ke
+      ? `Kârlılık sermaye maliyetinin altında olduğu için değer özkaynağın altında kaldı: ${N(x.value_total)}. Buna rağmen borsa değeri bunun da altında: değerin <span class="num">${pc0(d.mcap / x.value_total)}</span> kadarı.`
+      : `Kârlılık sermaye maliyetinin üstünde; aradaki fazla kâr değere eklendi: ${N(x.value_total)}. Borsa değeri bunun <span class="num">${pc0(d.mcap / x.value_total)}</span> kadarı.`);
+    out.calc = [['Özkaynak', tl(d.ri_book)], ['Son yıllık ROE', pc0(d.roe)], ['Sermaye maliyeti', pc0(d.ke)], ['Fazla kâr (bugünkü değeri)', tl(x.value_total - d.ri_book)], ['Değer', tl(x.value_total), 1], ['Borsa değeri', tl(d.mcap)]];
+    out.risk.push(d.roe < d.ke ? 'Ucuzluk, kârlılığın 5 yılda düzeleceği varsayımına dayanıyor. Zararın nedeni kalıcıysa değer düşer.' : 'Son yılın yüksek kârlılığı tekrarlanmayabilir.');
+    if (fin) out.risk.push('Aracı kurum ve finans şirketlerinde kârlar piyasa koşullarına çok bağlıdır.');
+  }
+  for (const w of x.warnings || []) out.risk.unshift(`<b>${esc(w)}</b>`);
+  out.quality = (x.quality || {}).flags || [];
+  out.qlevel = (x.quality || {}).level || '—';
+  if (x.turnover_usd != null && x.turnover_usd < 20000) out.risk.unshift('<b>Günlük işlem hacmi 20 bin $ altında; sistem bu hisseyi seçmez.</b>');
+  return out;
+}
+
+function scaleHTML(x) {
+  const hi = Math.max(x.price, x.value_ps) * 1.04, P = v => Math.max(0, Math.min(100, 100 * v / hi));
+  const cheap = x.value_ps > x.price;
+  return `<div class="scale"><div class="track"><div class="fill" style="width:${P(Math.max(x.price, x.value_ps))}%"></div>
+    <span class="lab up" style="left:${P(x.price)}%">Fiyat <b>${fx(x.price)}</b></span><span class="mk p" style="left:${P(x.price)}%"></span>
+    <span class="mk v" style="left:${P(x.value_ps)}%"></span><span class="lab up" style="left:${Math.min(P(x.value_ps), 78)}%">Model değeri <b>${fx(x.value_ps)}</b></span></div>
+    <p>${cheap ? `Fiyat, değerin <span class="num">${pc0(x.price / x.value_ps)}</span> kadarı.` : 'Fiyat değerin üstünde: sisteme göre pahalı.'}</p></div>`;
+}
+
+function openDetail(t, push = true) {
+  const x = ALL.find(r => r.ticker === t); if (!x) return;
+  const e = explain(x), a = x.group === 'VARLIK', pk = PICKS.has(t);
+  $('#sheetT').textContent = t;
+  $('#detail').innerHTML = `<div class="dh"><span class="big">${esc(t)}</span><span class="co">${esc(x.company)}</span>
+      <span class="tkline"><span class="chip ${a ? 'a' : 'o'}">${a ? 'VARLIK' : 'FAALİYET'}</span>${pk ? '<span class="chip pick">SİSTEM SEÇİMİ</span>' : ''}<span class="co">${esc(x.method)}</span></span></div>
+    <div class="trio"><div class="cell"><span>Fiyat</span><b>${fx(x.price)}</b></div><div class="cell v"><span>Model değeri</span><b>${fx(x.value_ps)}</b></div><div class="cell"><span>Model değerine fark</span><b class="${x.potential >= 0 ? 'up' : 'down'}">${pct(x.potential)}</b></div></div>
+    ${pfBlock(x)}
+    ${scaleHTML(x)}
+    <section class="qc ${e.qlevel === 'KIRMIZI' ? 'bad' : e.qlevel === 'SARI' ? 'mid' : 'ok'}"><h3>Kalite kontrolü: ${e.qlevel === 'KIRMIZI' ? '⛔ KIRMIZI — sistem bu hisseyi seçmez' : e.qlevel === 'SARI' ? '⚠ SARI — okuyup kontrol edin' : '✓ TEMİZ'}</h3>
+      ${e.quality.length ? `<ul>${e.quality.map(([l, m]) => `<li class="${l === 'KIRMIZI' ? 'r' : 'y'}"><b>${l}</b> ${esc(m)}</li>`).join('')}</ul>` : '<p>Bilanço içeriği (sermaye avansı, menkul kıymet, ertelenmiş vergi, ilişkili taraf alacağı, özkaynak sıçraması), son 6 ayın KAP olayları (SPK, kayyım/TMSF, konkordato, dava, bedelli/tahsisli artırım), grup şirketleri ve art arda taban kontrol edildi; sorun bulunmadı. Bu otomatik bir taramadır, KAP\'ı okumanın yerini tutmaz.</p>'}</section>
+    <section class="why"><h3>${e.qlevel === 'KIRMIZI' ? 'Formül neden ucuz gösteriyor (kırmızı bayrak nedeniyle güvenilmez)' : x.potential > 0 ? 'Neden ucuz?' : 'Neden pahalı?'}</h3><p class="lead">${e.lead}</p><ul>${e.why.map(s => `<li>${s}</li>`).join('')}</ul></section>
+    <section class="calc"><h3>Hesap</h3><table>${e.calc.map(([k, v, t]) => `<tr${t ? ' class="tot"' : ''}><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table></section>
+    <section class="risk"><h3>Almadan önce kontrol et</h3><ul>${e.risk.map(s => `<li${s.startsWith('<b>') ? ' class="w"' : ''}>${s}</li>`).join('')}</ul></section>
+    <section class="src"><h3>Kaynak</h3><p>Bilanço dönemi ${DATE(x.period_end)}, KAP'ta yayın ${esc(x.published_at)}. Fiyat ${DATE(x.price_date)} kapanışı.</p>
+      ${(x.source_urls || []).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join('<br>')}</section>`;
+  const s = $('#sheet'); s.classList.add('open'); s.setAttribute('aria-hidden', 'false'); s.scrollTop = 0;
+  if (TG) try { TG.BackButton.show(); } catch (e) { }
+  if (push && location.hash !== '#' + t) location.hash = t;
+  $('#back').focus({preventScroll: true});
+}
+function closeDetail() {
+  const s = $('#sheet'); s.classList.remove('open'); s.setAttribute('aria-hidden', 'true');
+  if (TG) try { TG.BackButton.hide(); } catch (e) { }
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+}
+
+function render() {
+  document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+  const v = $('#view');
+  if (!D) { v.innerHTML = '<div class="empty">Henüz tarama yok.</div>'; return; }
+  if (tab === 'top') v.innerHTML = viewTop();
+  if (tab === 'all') { v.innerHTML = viewAll(); fillAll(); }
+  if (tab === 'how') v.innerHTML = viewHow();
+  if (tab === 'pf') v.innerHTML = viewPf();
+}
+
+document.addEventListener('click', e => {
+  const r = e.target.closest('.row'); if (r) { openDetail(r.dataset.t); return; }
+  const tb = e.target.closest('.tabs button'); if (tb) { tab = tb.dataset.tab; render(); return; }
+  const pb = e.target.closest('[data-pf]');
+  if (pb) {
+    const t = pb.dataset.t, a = pb.dataset.pf, x = ALL.find(r => r.ticker === t) || {ticker: t};
+    if (a === 'form' || a === 'edit') { $('#pfbox').outerHTML = pfBlock(x, true); const i = $('#pf-qty'); if (i) i.focus(); }
+    if (a === 'cancel') $('#pfbox').outerHTML = pfBlock(x);
+    if (a === 'save') pfSubmit(t);
+    if (a === 'ask') $('#pfact').innerHTML = `<span class="hint">${esc(t)} portföyden çıkarılsın mı?</span><button class="btn danger" data-pf="del" data-t="${esc(t)}">Evet, çıkar</button><button class="btn" data-pf="cancel" data-t="${esc(t)}">Vazgeç</button>`;
+    if (a === 'del') { pfRemove(t); toast(`${t} portföyden çıkarıldı`); }
+    return;
+  }
+  const f = e.target.closest('#filters button'); if (f) { filt = f.dataset.f; document.querySelectorAll('#filters button').forEach(b => b.setAttribute('aria-pressed', String(b === f))); fillAll(); }
+});
+document.addEventListener('submit', e => { if (e.target.id === 'pfform') { e.preventDefault(); pfSubmit(e.target.dataset.t); } });
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.closest && e.target.closest('#pfform')) { e.preventDefault(); pfSubmit(e.target.closest('#pfform').dataset.t); } });
+document.addEventListener('input', e => { if (e.target.id === 'q') { query = e.target.value; fillAll(); } });
+$('#back').addEventListener('click', closeDetail);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#sheet').classList.contains('open')) closeDetail(); });
+window.addEventListener('hashchange', () => { const t = location.hash.slice(1); if (t && ALL.some(r => r.ticker === t)) openDetail(t, false); else closeDetail(); });
+
+if (TG) {
+  try {
+    TG.ready(); TG.expand();
+    document.documentElement.setAttribute('data-theme', TG.colorScheme === 'dark' ? 'dark' : 'light');
+    TG.onEvent('themeChanged', () => document.documentElement.setAttribute('data-theme', TG.colorScheme === 'dark' ? 'dark' : 'light'));
+    TG.BackButton.onClick(() => closeDetail());
+  } catch (e) { }
+}
+(async () => {
+  let data = null;
+  try { const raw = $('#embedded').textContent.trim(); if (raw.startsWith('{')) data = JSON.parse(raw); } catch (e) { }
+  if (!data) {
+    for (const u of ['/api/final', 'final_snapshot.json']) { try { const r = await fetch(u, {cache: 'no-store'}); if (r.ok) { data = await r.json(); if (data.picks) break; } } catch (e) { } }
+  }
+  if (data && data.picks) {
+    prep(data);
+    $('#stamp').textContent = `${DATE(data.asof)} kapanışı · ${ALL.length} hisse değerlendi`;
+  } else $('#stamp').textContent = 'Veri bulunamadı. Bilgisayarda 05_MK_FINAL_WINDOWS.bat çalıştırın.';
+  render();
+  pfInit();
+  const t = location.hash.slice(1); if (t && ALL.some(r => r.ticker === t)) openDetail(t, false);
+})();
+</script>
+
+</body>
+</html>
