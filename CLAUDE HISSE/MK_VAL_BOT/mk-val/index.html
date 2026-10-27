@@ -130,6 +130,10 @@ footer{color:var(--muted);font-size:.74rem}
 .risk li.w{color:var(--bad)}
 .src a{color:var(--op);word-break:break-all;font-size:.84rem}
 .src p{margin:0 0 6px;font-size:.84rem;color:var(--muted)}
+
+.wrap{padding-top:calc(14px + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));padding-bottom:calc(48px + var(--tg-safe-area-inset-bottom, 0px) + var(--tg-content-safe-area-inset-bottom, 0px))}
+.tabs{top:calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px))}
+.sheet{padding-top:calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px))}
 </style>
 
 <div class="wrap" lang="tr">
@@ -494,6 +498,7 @@ window.addEventListener('hashchange', () => { const t = location.hash.slice(1); 
 if (TG) {
   try {
     TG.ready(); TG.expand();
+    if (typeof TG.requestFullscreen === 'function' && TG.isVersionAtLeast('8.0')) { try { TG.requestFullscreen(); } catch (_) { } }
     document.documentElement.setAttribute('data-theme', TG.colorScheme === 'dark' ? 'dark' : 'light');
     TG.onEvent('themeChanged', () => document.documentElement.setAttribute('data-theme', TG.colorScheme === 'dark' ? 'dark' : 'light'));
     TG.BackButton.onClick(() => closeDetail());
