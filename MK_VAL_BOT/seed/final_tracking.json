@@ -1,0 +1,62 @@
+[
+  {
+    "asof": "2026-10-23",
+    "avg": 0.0,
+    "rows": [
+      {
+        "ticker": "IHGZT",
+        "group": "VARLIK",
+        "entry": 0.7900000214576721,
+        "now": 0.7900000214576721,
+        "ret": 0.0,
+        "max_ret": 0.0,
+        "above_value": false,
+        "due": "2027-10-23"
+      },
+      {
+        "ticker": "KZBGY",
+        "group": "VARLIK",
+        "entry": 1.059999942779541,
+        "now": 1.059999942779541,
+        "ret": 0.0,
+        "max_ret": 0.0,
+        "above_value": false,
+        "due": "2027-10-23"
+      },
+      {
+        "ticker": "ADESE",
+        "group": "VARLIK",
+        "entry": 0.49000000953674316,
+        "now": 0.49000000953674316,
+        "ret": 0.0,
+        "max_ret": 0.0,
+        "above_value": false,
+        "due": "2027-10-23"
+      },
+      {
+        "ticker": "DAPGM",
+        "group": "FAALİYET",
+        "entry": 2.3299999237060547,
+        "now": 2.3299999237060547,
+        "ret": 0.0,
+        "max_ret": 0.0,
+        "above_value": false,
+        "due": "2027-10-23"
+      },
+      {
+        "ticker": "ARASE",
+        "group": "FAALİYET",
+        "entry": 69.94999694824219,
+        "now": 69.94999694824219,
+        "ret": 0.0,
+        "max_ret": 0.0,
+        "above_value": false,
+        "due": "2027-10-23"
+      }
+    ],
+    "controls": {
+      "5+5 (eski 10 hisse)": 0.0,
+      "basit en düşük PD/DD 5": 0.0
+    }
+  }
+]

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: mk-val-bot
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    disk:
+      name: mk-val-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: ADMIN_ID
+        sync: false
+      - key: DATA_DIR
+        value: /var/data
