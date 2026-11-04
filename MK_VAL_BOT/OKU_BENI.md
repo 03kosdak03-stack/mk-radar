@@ -25,7 +25,13 @@ Bot ilk çalışırken menüyü otomatik kurar. Aynı tokenla yalnız bir bot s�
 Kalıcı diski kaldırma: haftalık sürümler ve Telegram işlem konumu orada tutulur.
 Bu paket henüz canlı bir hesaba bağlanmadı; token olmadan canlı test yapılamaz.
 
-## Her hafta — telefondan
+## Her hafta — bilgisayardan tek tuş (önerilen)
+
+MK_VAL_AI_V2 klasöründe `08_HAFTALIK_TEK_TUS.bat`: tarama + değerleme + bu bota yükleme (`POST /api/upload`).
+Render'da `UPLOAD_KEY` ortam değişkeni gerekir (bilgisayarda `bulut_yukle.py --anahtar` üretir, ayrıntı: TEK_TUS_KURULUM_TR.md).
+Yükleme başarılı olunca bot Telegram'dan haber verir.
+
+## Her hafta — telefondan (yedek yol)
 
 Yeni tarama sonucunu içeren ZIP'i botla özel sohbetine dosya olarak gönder.
 Bot tarih/biçim denetimi yapar, sonucu kaydeder ve başarı mesajı verir.

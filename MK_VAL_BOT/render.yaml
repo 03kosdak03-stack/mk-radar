@@ -13,5 +13,7 @@ services:
         sync: false
       - key: ADMIN_ID
         sync: false
+      - key: UPLOAD_KEY
+        sync: false
       - key: DATA_DIR
         value: /var/data

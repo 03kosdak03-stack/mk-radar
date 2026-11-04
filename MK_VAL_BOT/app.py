@@ -1,4 +1,5 @@
 """Standalone MK VAL: Telegram polling, bounded ZIP import, persistent snapshots."""
+import hmac
 import io
 import json
 import math
@@ -22,6 +23,9 @@ LIMIT = 15 * 1024 * 1024
 TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 ADMIN = int(os.environ.get('ADMIN_ID', '0'))
 PUBLIC = os.environ.get('PUBLIC_URL', os.environ.get('RENDER_EXTERNAL_URL', '')).rstrip('/')
+# PC'deki tek tuş güncellemesinin yükleme anahtarı (bot tokenından ayrı, en az 32 karakter)
+UPLOAD_KEY = os.environ.get('UPLOAD_KEY', '')
+_FAILS, _FLOCK = {}, threading.Lock()
 
 def db():
     c = sqlite3.connect(DATA / 'bot.sqlite3', timeout=30)
@@ -179,9 +183,62 @@ def handle(m):
         replies._load = p.get
         send(chat, replies.reply(mapping.get(cmd, cmd), arg))
 
+def notify_admin(text):
+    try:
+        if TOKEN and ADMIN > 0: send(ADMIN, text)
+    except Exception:
+        pass
+
+def picks_text(d):
+    return ' · '.join(f"{p['ticker']} ({'+' if p['potential'] > 0 else ''}%{100 * p['potential']:.0f})" for p in d['picks'])
+
 class Web(BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass
+
+    def _json(self, code, obj):
+        body = json.dumps(obj, ensure_ascii=False).encode()
+        self.send_response(code)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Content-Length', str(len(body)))
+        self.send_header('Cache-Control', 'no-store')
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_POST(self):
+        """PC'den haftalık ZIP: X-Upload-Key başlığı + ZIP gövdesi. Telegram'daki ZIP yüklemesiyle aynı denetimler."""
+        # Önce gövde okunur (en fazla 15 MB); böylece hata cevabında istemcinin bağlantısı kopmaz.
+        try:
+            n = int(self.headers.get('Content-Length') or 0)
+        except ValueError:
+            n = 0
+        if n <= 0 or n > LIMIT:
+            self.close_connection = True
+            return self._json(413, {'ok': False, 'error': 'ZIP boş ya da 15 MB üstü.'})
+        blob = self.rfile.read(n)
+        if urlsplit(self.path).path != '/api/upload':
+            return self._json(404, {'ok': False, 'error': 'Bulunamadı.'})
+        if len(UPLOAD_KEY) < 32:
+            return self._json(503, {'ok': False, 'error': 'Sunucuda UPLOAD_KEY ayarlı değil (en az 32 karakter).'})
+        ip = (self.headers.get('X-Forwarded-For') or self.client_address[0]).split(',')[0].strip()
+        now = time.time()
+        with _FLOCK:
+            fails = [t for t in _FAILS.get(ip, []) if now - t < 3600]
+            _FAILS[ip] = fails
+            if len(fails) >= 5:
+                return self._json(429, {'ok': False, 'error': 'Çok fazla hatalı deneme; 1 saat sonra tekrar deneyin.'})
+        if not hmac.compare_digest(self.headers.get('X-Upload-Key', '').encode(), UPLOAD_KEY.encode()):
+            with _FLOCK:
+                _FAILS.setdefault(ip, []).append(now)
+            time.sleep(1)
+            return self._json(403, {'ok': False, 'error': 'Yükleme anahtarı geçersiz.'})
+        try:
+            stamp = import_zip(blob)
+        except (ValueError, KeyError, TypeError, zipfile.BadZipFile) as e:
+            return self._json(400, {'ok': False, 'error': 'ZIP kabul edilmedi, mevcut veri korundu: ' + str(e)[:200]})
+        d = current()[NAMES[0]]
+        notify_admin(f"Haftalık güncelleme yüklendi (bilgisayardan).\nTarama: {stamp}\nSeçim: {picks_text(d)}\nUygulamayı kapatıp açın. Yatırım tavsiyesi değildir.")
+        return self._json(200, {'ok': True, 'asof': stamp, 'picks': [p['ticker'] for p in d['picks']]})
 
     def do_GET(self):
         path = urlsplit(self.path).path

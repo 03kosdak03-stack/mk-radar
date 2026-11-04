@@ -128,13 +128,37 @@ footer{color:var(--muted);font-size:.74rem}
 .calc td:last-child{text-align:right;font-family:var(--m);font-variant-numeric:tabular-nums;white-space:nowrap}
 .calc tr.tot td{font-weight:700;background:var(--value-soft);color:var(--value)}
 .risk li.w{color:var(--bad)}
+.thesis{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--value);border-radius:12px;padding:14px 14px 12px}
+.thesis.bad{border-left-color:var(--bad)}.thesis.mid{border-left-color:var(--gold)}
+.thesis h3{margin:0 0 8px;font-size:1.08rem;font-weight:800}
+.thesis h4{margin:14px 0 6px;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.thesis ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:7px}
+.thesis li{line-height:1.5;font-size:.94rem}
+.thesis .hist{display:block;margin-top:4px;font-size:.8rem;color:var(--muted)}
+.thesis .fine{margin:12px 0 0;font-size:.74rem;color:var(--muted)}
+.comp{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px}
+.comp h3{margin:0 0 8px;font-size:1.05rem;font-weight:800}
+.comp h4{margin:14px 0 6px;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.comp h4.g{color:var(--value)}.comp h4.b{color:var(--bad)}
+.comp ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:7px}.comp li{line-height:1.5;font-size:.94rem}
+.comp .fine{margin:12px 0 0;font-size:.74rem;color:var(--muted)}
+.own{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.own h3{margin:0 0 8px;font-size:1.02rem;font-weight:700}
+.own table{width:100%;border-collapse:collapse;font-size:.88rem}
+.own th{text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:0 0 6px}
+.own th:not(:first-child),.own td:not(:first-child){text-align:right;font-family:var(--m);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
+.own td{padding:7px 0;border-top:1px solid var(--line);vertical-align:top}
+.own tr.oth td{color:var(--muted)}
+.own ul{margin:10px 0 0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}.own li{font-size:.9rem;line-height:1.45}
+.own .fine{margin:10px 0 0;font-size:.74rem;color:var(--muted)}
+.olink{font:inherit;font-size:.74rem;font-weight:700;color:var(--op);background:var(--op-soft);border:0;border-radius:999px;padding:1px 8px;cursor:pointer;white-space:nowrap}
 .src a{color:var(--op);word-break:break-all;font-size:.84rem}
 .src p{margin:0 0 6px;font-size:.84rem;color:var(--muted)}
 </style>
 
 <div class="wrap" lang="tr">
   <header>
-    <span class="eyebrow">MK Hisseler · MK Final 1.4</span>
+    <span class="eyebrow">MK Hisseler · MK Final 1.5</span>
     <h1>Hisselerin değeri</h1>
     <span class="stamp" id="stamp">Yükleniyor…</span>
   </header>
@@ -145,7 +169,7 @@ footer{color:var(--muted);font-size:.74rem}
     <button role="tab" id="tab-how" data-tab="how" aria-selected="false">Sistem</button>
   </nav>
   <main id="view"></main>
-  <footer>MK Final 1.4, açıklanmış finansal veriler ve belirli varsayımlarla araştırma amaçlı değer senaryoları üretir. Gösterilen model değeri ve potansiyel, 12 ay içinde gerçekleşmesi beklenen veya garanti edilen getiri değildir. Pay sayısı, sermaye işlemleri, konsolidasyon, enflasyon muhasebesi ve şirket olaylarındaki eksikler sonucu önemli ölçüde değiştirebilir; kırmızı bayrak bulunmaması şirketin risksiz olduğunu göstermez. Geçmiş testlerde sağ kalan şirket yanlılığı, tarihsel ortaklık bilgisi eksikliği ve geçmiş sonuçlar görülerek geliştirilmiş kurallar vardır; sonuçlar bağımsız olarak doğrulanmamıştır. Yatırım tavsiyesi değildir.</footer>
+  <footer>MK Final 1.5, açıklanmış finansal veriler ve belirli varsayımlarla araştırma amaçlı değer senaryoları üretir. Gösterilen model değeri ve potansiyel, 12 ay içinde gerçekleşmesi beklenen veya garanti edilen getiri değildir. Pay sayısı, sermaye işlemleri, konsolidasyon, enflasyon muhasebesi ve şirket olaylarındaki eksikler sonucu önemli ölçüde değiştirebilir; kırmızı bayrak bulunmaması şirketin risksiz olduğunu göstermez. Geçmiş testlerde sağ kalan şirket yanlılığı, tarihsel ortaklık bilgisi eksikliği ve geçmiş sonuçlar görülerek geliştirilmiş kurallar vardır; sonuçlar bağımsız olarak doğrulanmamıştır. Yatırım tavsiyesi değildir.</footer>
 </div>
 
 <section class="sheet" id="sheet" aria-hidden="true" lang="tr">
@@ -153,7 +177,7 @@ footer{color:var(--muted);font-size:.74rem}
   <div class="d" id="detail"></div>
 </section>
 
-<script type="application/json" id="embedded"></script>
+<script type="application/json" id="embedded">__DATA__</script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -234,10 +258,11 @@ function viewHow() {
   <b>Faaliyet şirketleri</b>: değer = 16 × gelecek yıl net kârı. Kâr tahmin edilemeyen (zarar eden, finans) şirketlerde özkaynak + kârlılık yöntemi kullanılır.<br><br>
   <b>Kural:</b> varlık grubundan en ucuz 3 + faaliyet grubundan en ucuz 2 = 5 hisse, eşit para. Önerilen kullanım: parayı 4'e bölüp her çeyrek (Ocak, Nisan, Temmuz, Ekim) o haftanın 5 hissesine bir dilim yatırmak; satış zamanı sizin kararınız. Günlük işlemi 20 bin $ altındaki ve kırmızı bayraklı hisse seçilmez.<br><br>
   <b>Model değerine göre fark</b> = model değeri / fiyat − 1. Beklenen getiri veya gerçekleşme olasılığı değildir; gerçekleşme süresi belirsizdir ve model değeri düşebilir. Hedef fiyat verilmez; ne zaman satacağınız size kalmış.</div>
-  <div class="note"><b>Geriye dönük test — MK Final 1.4 (final)</b>: 3 varlık + 2 faaliyet; gizli değer sıralamada değil (ek senaryo); kırmızı bayraklı hisse yok; aynı gruptan tek hisse; pay sayısı doğrulanamayan adımda en yüksek piyasa değeri varsayılır (hisse ancak öyle de ucuzsa seçilir); seçim günün kapanışından sonra, alım ertesi gün.<br>
-  12 ay tutma, başlangıç ayına göre 7 yıl: Nisan <b>418 kat</b> · Ocak 225 · Temmuz 128 · Ekim 65 (4 dilim ortalaması ≈ 209) — XU100 13-15 kat. Yıl içi en kötü düşüş −%53.<br>
-  <b>Değerine gelince satıp parayı haftanın yeni hissesine yatırmak</b>: Nisan 250 · Ocak 156 · Temmuz 96 · Ekim 50 kat (ort. ≈ 138). Her başlangıç ayında 12 ay tutmaktan düşük: getirinin büyük kısmı model değerini aşıp yükselmeye devam eden hisselerden geldi.<br>
-  Bu sonuçlar <b>doğrulanmış başarı değildir</b>: 3+2 yapısı geçmiş sonuçlar görülerek seçildi; aynı evrenden rastgele 10 hisse bile bu dönemde 28-56 kat yaptı (küçük/orta hisse ve ucuzluk etkisi); 5 hisse ciddi düşüş yaşayabilir. Bundan sonrası kurallar değiştirilmeden sanal takiple izlenir; eski 10 hisselik liste ve basit en düşük PD/DD listesi de karşılaştırma için kaydedilir.</section>`;
+  <div class="note"><b>Geriye dönük test — MK Final 1.5</b>: 3 varlık + 2 faaliyet; <b>gizli değer sıralamada</b> (borsadaki bağlı GYO'nun ekspertiz farkı, Reysaş tipi); kırmızı bayraklı hisse yok; aynı gruptan tek hisse; pay sayısı doğrulanamayan adımda en yüksek piyasa değeri varsayılır; seçim günün kapanışından sonra, alım ertesi gün.<br>
+  12 ay tutma, başlangıç ayına göre 7 yıl: Nisan <b>598 kat</b> · Ocak 236 · Temmuz 132 · Ekim 82 — XU100 13-15 kat. Yıl içi en kötü düşüş −%61.<br>
+  Gizli değer kapalıyken (1.4): 418 · 225 · 128 · 65. Aradaki farkın tamamı RYSAS'ın 2019'da (Nisan başlangıcında 2022'de de) bağlı ortaklığı RYGYO yerine seçilmesinden geliyor; kural Reysaş örneğine bakılarak kurulduğu için bu fark geçmişte iyimser görünür.<br>
+  Bu sonuçlar <b>doğrulanmış başarı değildir</b>: 3+2 yapısı geçmiş sonuçlar görülerek seçildi; aynı evrenden rastgele 10 hisse bile bu dönemde 28-56 kat yaptı (küçük/orta hisse ve ucuzluk etkisi); 5 hisse ciddi düşüş yaşayabilir. Bundan sonrası sanal takiple izlenir.</div>
+  </section>`;
 }
 
 
@@ -376,11 +401,12 @@ function explain(x) {
     else out.why.push(`<b>Varlığının <span class="num">${pc0(d.real_estate_share)}</span> kadarı gayrimenkul</b> (yatırım amaçlı gayrimenkul, arsa, bina). Böyle şirketlerde değeri kârdan çok elindeki mal belirler.`);
     out.why.push(`Toplam varlığı ${N(d.total_assets)}. Bütün borçlar düşülünce ana ortaklığa ${N(d.equity)} özkaynak kalıyor.`);
     if (d.capital_advance > 0) out.why.push(`<b>Sermaye avansı düşüldü:</b> özkaynağın ${N(d.capital_advance)} kısmı henüz pay olarak tescil edilmemiş sermaye avansı. Bu para ya yeni paylara dönüşür (mevcut hissedarın payı sulanır) ya da iade edilir; bu yüzden değere katılmadı.`);
-    if (d.hidden > 0) out.why.push(`<b>Ek senaryo (doğrulanmamış, sıralamaya katılmadı):</b> bağlı ortaklığı ${esc((x.hidden_from || []).join(', '))} gayrimenkullerini ekspertiz değeriyle gösteriyor; basit formülle payına düşen fark ${N(d.hidden)}. Bu fark taşınmaz bazında doğrulanmadığı için değere eklenmedi. Eklenirse hisse başı <span class="num">${fx(d.hidden_scenario_ps)} TL</span> olurdu (Reysaş tipi aday — KAP'tan ekspertiz raporlarını kontrol edin).`);
+    if (d.hidden > 0 && d.hidden_in_rank) out.why.push(`<b>Gizli değer eklendi (Reysaş tipi):</b> bağlı ortaklığı ${esc((x.hidden_from || []).join(', '))} gayrimenkullerini ekspertiz değeriyle gösteriyor; şirketin payına düşen fark ${N(d.hidden)} değere eklendi. Bu fark otomatik hesaplanır, taşınmaz bazında doğrulanmamıştır; KAP'tan ekspertiz raporlarını kontrol edin. Gizli değer olmasaydı hisse başı değer <span class="num">${fx(x.price * (x.value_total - d.hidden) / d.mcap)} TL</span> olurdu.`);
+    else if (d.hidden > 0) out.why.push(`<b>Ek senaryo (doğrulanmamış, sıralamaya katılmadı):</b> bağlı ortaklığı ${esc((x.hidden_from || []).join(', '))} gayrimenkullerini ekspertiz değeriyle gösteriyor; basit formülle payına düşen fark ${N(d.hidden)}. Eklenirse hisse başı <span class="num">${fx(d.hidden_scenario_ps)} TL</span> olurdu.`);
     out.why.push(`Hisse başına değer <span class="num">${fx(x.value_ps)} TL</span>, bugünkü fiyat <span class="num">${fx(x.price)} TL</span>. Model değerine göre fark <span class="num">${pct(x.potential)}</span> (beklenen getiri değildir).`);
     out.calc = [['Toplam varlık', tl(d.total_assets)], ['Özkaynak (ana ortaklık)', tl(d.equity)]];
     if (d.capital_advance > 0) out.calc.push(['Sermaye avansı (düşüldü)', '− ' + tl(d.capital_advance)]);
-    if (d.hidden > 0) out.calc.push([`Ek senaryo: gizli değer (${(x.hidden_from || []).join(', ')}) — sıralamada yok`, '(+ ' + tl(d.hidden) + ')']);
+    if (d.hidden > 0) out.calc.push(d.hidden_in_rank ? [`Gizli değer: bağlı GYO ekspertiz farkı (${(x.hidden_from || []).join(', ')})`, '+ ' + tl(d.hidden)] : [`Ek senaryo: gizli değer (${(x.hidden_from || []).join(', ')}) — sıralamada yok`, '(+ ' + tl(d.hidden) + ')']);
     out.calc.push(['Değer', tl(x.value_total), 1], ['Borsa değeri', tl(d.mcap)], ['Borsa değeri / değer', x2(ratio)]);
     out.risk.push('Özkaynak, 2023 sonundan beri enflasyon muhasebesiyle (TMS 29) yeniden değerleniyor. Bu, varlıkları olduğundan yüksek gösterebilir.');
     out.risk.push('Varlık değeri ancak satılırsa, kiraya ya da kâra dönüşürse fiyata yansır. Bu tip hisseler yıllarca ucuz kalabilir; sistem bu yüzden 12 ay bekler.');
@@ -407,7 +433,9 @@ function explain(x) {
     out.lead = `Borsa değeri ${N(d.mcap)}, özkaynağı ${N(d.ri_book)} (PD/DD <span class="num">${x2(pb)}</span>). Kârlılığı normale dönerse sistemin değeri ${N(x.value_total)}.`;
     out.why.push(fin ? `<b>Finans şirketi.</b> Ciro ve brüt marj bu şirketlerde anlamlı değil. Değer özkaynaktan ve özkaynak kârlılığından hesaplanır.`
       : `<b>Gelecek yıl kârı tahmin edilemedi</b> (kâr düşük ya da zarar). Bu durumda MK Final 1.0'ın yedek yöntemi kullanılır: özkaynak + gelecekteki fazla kâr.`);
-    if (d.ttm_profit != null) out.why.push(`Son 12 ay net kâr ${N(d.ttm_profit)}${d.ttm_profit_prior != null ? `, bir önceki 12 ay ${N(d.ttm_profit_prior)}` : ''}.`);
+    { const F = (x.ctx || {}).fin, per = F && F.months ? (F.months === 12 ? 'yıllık' : `ilk ${F.months} ay`) : 'son rapor dönemi';
+      const np = F ? F.np : d.ttm_profit, npp = F ? F.np_prior : d.ttm_profit_prior;
+      if (np != null) out.why.push(`${F && F.period_end ? String(F.period_end).slice(0, 4) + ' ' : ''}${per} net kâr ${N(np)}${npp != null ? `, geçen yılın aynı döneminde ${N(npp)}` : ''}.`); }
     out.why.push(`Son yıllık özkaynak kârlılığı (ROE) <span class="num">${pc0(d.roe)}</span>. Sistem bunu 5 yılda sermaye maliyeti olan <span class="num">${pc0(d.ke)}</span> seviyesine yaklaştırıyor.`);
     out.why.push(d.roe < d.ke
       ? `Kârlılık sermaye maliyetinin altında olduğu için değer özkaynağın altında kaldı: ${N(x.value_total)}. Buna rağmen borsa değeri bunun da altında: değerin <span class="num">${pc0(d.mcap / x.value_total)}</span> kadarı.`
@@ -421,6 +449,178 @@ function explain(x) {
   out.qlevel = (x.quality || {}).level || '—';
   if (x.turnover_usd != null && x.turnover_usd < 20000) out.risk.unshift('<b>Günlük işlem hacmi 20 bin $ altında; sistem bu hisseyi seçmez.</b>');
   return out;
+}
+
+/* "Yatırım gerekçesi": sistemin hesabını, fiyatın son 1 yılını ve sistemin geçmişini sade dille anlatır. Yalnız snapshot verisinden. */
+const MON = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+const QD = s => { const d = new Date(String(s).slice(0, 10) + 'T12:00:00'); return isNaN(d) ? s : MON[d.getMonth()] + ' ' + d.getFullYear(); };
+function nextReport(pe) {
+  const d = new Date(String(pe).slice(0, 10) + 'T12:00:00'); if (isNaN(d)) return null;
+  // KAP'ta ara dönemler genelde dönem sonundan ~6-7 hafta, yıllık ~10 hafta sonra yayımlanır
+  const end = new Date(d.getFullYear(), d.getMonth() + 4, 0, 12), due = new Date(end.getTime() + (end.getMonth() === 11 ? 70 : 48) * 864e5);
+  return {end: end.toLocaleDateString('tr-TR', {day: 'numeric', month: 'long', year: 'numeric'}), due: MON[due.getMonth()] + ' ' + due.getFullYear()};
+}
+function groupRank(x) {
+  const L = (x.group === 'VARLIK' ? D.asset : D.operating).filter(r => r.eligible);
+  const i = L.findIndex(r => r.ticker === x.ticker); return i < 0 ? null : {rank: i + 1, of: L.length};
+}
+function thesis(x) {
+  const d = x.detail || {}, c = x.ctx || {}, a = x.group === 'VARLIK', T = esc(x.ticker);
+  const red = (x.quality || {}).level === 'KIRMIZI', PS = (D.pick_stats || {}), S = (PS.stats || {})[a ? 'VARLIK' : 'FAALİYET'];
+  const o = {title: 'Yatırım gerekçesi', lead: '', facts: [], push: [], past: [], breaks: [], tone: 'ok'};
+  if (red) { o.title = 'Bu hisse neden seçilmiyor'; o.tone = 'bad'; }
+  else if (!(x.potential > 0)) { o.title = 'Sisteme göre neden ucuz değil'; o.tone = 'mid'; }
+  const ratio = x.value_ps > 0 ? x.price / x.value_ps : null;
+  // 1) tez
+  if (red) o.lead = `Formül ${T} için model değerine göre ${pct(x.potential)} fark hesaplıyor, ama kalite kontrolü kırmızı bayrak buldu (aşağıda). Bu tür bir sorun varken bilançodaki rakamlar güvenilir değildir; sistem bu hisseyi ucuz da olsa seçmez.`;
+  else if (!(x.potential > 0)) o.lead = `Fiyat, sistemin hesapladığı model değerinin üstünde (100 TL'lik model değeri için borsada <span class="num">${fx(100 * ratio)} TL</span> ödeniyor). Sistemin ölçüsüne göre bugün bir ucuzluk gerekçesi yok.`;
+  else if (a && x.type === 'gyo') o.lead = `${T} bir gayrimenkul yatırım ortaklığı. Portföyü her yıl bağımsız ekspertizle değerleniyor ve bilançoya bu değerle giriyor. Bugün şirketin 100 TL'lik net varlığı borsada yalnızca <span class="num">${fx(100 * ratio)} TL</span> ediyor. Gerekçe, bu iskontonun zamanla kapanması.`;
+  else if (a && x.type === 'holding') o.lead = `${T} bir holding. Değeri iştiraklerindeki paylardan ve elindeki varlıklardan geliyor. Holdingin 100 TL'lik net varlığı borsada <span class="num">${fx(100 * ratio)} TL</span> ediyor. Holdingler çoğu zaman net varlığının altında işlem görür, bu iskontonun bir kısmı kalıcı olabilir; gerekçe, iskontonun olağandan çok derin olması.`;
+  else if (a) o.lead = `${T}, varlıklarının <span class="num">${pc0(d.real_estate_share)}</span> kadarı gayrimenkul (arsa, bina, yatırım amaçlı gayrimenkul) olan bir şirket. 100 TL'lik net varlığı borsada <span class="num">${fx(100 * ratio)} TL</span> ediyor. Gerekçe, elindeki varlığın değerinin fiyata yansıması.`;
+  else if (String(d.engine || '').startsWith('MK-FINAL')) {
+    const fpe = d.forward_profit > 0 ? d.mcap / d.forward_profit : null;
+    o.lead = `${T} son 12 ayda ${N(d.ttm_profit)} net kâr etti. Sistem, geçen yılki büyümenin yarısı sürerse gelecek yıl ${N(d.forward_profit)} kâr hesaplıyor. Borsa bugün bu kârın <span class="num">${x2(fpe)}</span> katını ödüyor; sistem 16 katını makul sayıyor. Gerekçe, kâr gerçekleştikçe fiyatın kârı izlemesi.`;
+  } else o.lead = `${T} için gelecek yıl kârı tahmin edilemedi; değer özkaynaktan ve kârlılığın normale döneceği varsayımından hesaplandı. 100 TL'lik model değeri borsada <span class="num">${fx(100 * ratio)} TL</span> ediyor. Gerekçe, kârlılığın düzelmesi.`;
+  // 2) rakamlarla
+  if (c.ret1y != null) o.facts.push(`<b>Fiyatın son 1 yılı:</b> <span class="num">${pct(c.ret1y)}</span>. 52 haftanın zirvesinin <span class="num">${pct(c.off_high)}</span> altında${c.off_low != null && c.off_low < 0.05 ? ', <b>en dibine çok yakın</b>' : `, dibinin <span class="num">${pct(c.off_low)}</span> üstünde`}.`);
+  else if (c.listed_days != null && c.listed_days < 400) o.facts.push(`<b>Yeni halka arz:</b> borsada yaklaşık ${Math.round(c.listed_days / 30)} aydır işlem görüyor; fiyat geçmişi kısa.`);
+  if (c.value_chg1y != null && c.ret1y != null && x.potential > 0 && !red) {
+    const v = c.value_chg1y, r = c.ret1y;
+    if (r < 0 && v > r + 0.25) o.facts.push(`<b>Ucuzluk fiyatın düşmesinden geliyor:</b> sistemin şirket değeri 1 yılda <span class="num">${pct(v)}</span> değişirken fiyat <span class="num">${pct(r)}</span>. Hesaplanan değer düşmeden fiyat düşmüş; piyasanın neden sattığını bilmek önemli.`);
+    else if (v > r + 0.25) o.facts.push(`<b>Ucuzluk değerin artmasından geliyor:</b> şirket değeri 1 yılda <span class="num">${pct(v)}</span> arttı, fiyat <span class="num">${pct(r)}</span>. Fiyat, değerdeki artışa henüz yetişmedi.`);
+    else o.facts.push(`Şirket değeri 1 yılda <span class="num">${pct(v)}</span>, fiyat <span class="num">${pct(r)}</span> değişti.`);
+  }
+  const H = (c.pot_hist || []).filter(h => h[1] != null);
+  if (H.length && x.potential > 0 && !red) {
+    const cheap = H.filter(h => h[1] > 0.2).length, first = H[0];
+    const line = H.map(h => `${QD(h[0])}: <span class="num">${pct(h[1])}</span>`).join(' · ') + ` · bugün: <span class="num">${pct(x.potential)}</span>`;
+    o.facts.push((cheap === H.length ? `<b>Uzun süredir ucuz:</b> son 1 yıldaki ${H.length} ölçümün hepsinde değerinin belirgin altındaydı.`
+      : first[1] <= 0 ? `<b>Ucuzluk yeni:</b> ${QD(first[0])} ölçümünde fiyat değerinin üstündeydi.`
+      : `Son 1 yıldaki ${H.length} ölçümün ${cheap}'inde değerinin belirgin altındaydı.`) + `<br><span class="hist">Model değerine fark — ${line}</span>`);
+  }
+  if (!a && !red && d.ttm_profit != null && d.ttm_profit_prior && String(d.engine || '').startsWith('MK-FINAL') && !(x.ctx || {}).fin) {
+    const ch = d.ttm_profit_prior > 0 ? d.ttm_profit / d.ttm_profit_prior - 1 : null;
+    o.facts.push(`<b>Kâr gidişi:</b> son 12 ay net kâr ${N(d.ttm_profit)}, bir önceki 12 ay ${N(d.ttm_profit_prior)}${ch != null ? ` (<span class="num">${pct(ch)}</span>)` : ''}.`);
+  }
+  const gr = groupRank(x);
+  if (gr && !red && x.potential > 0) o.facts.push(PICKS.has(x.ticker) ? `<b>Bu haftanın 5 hissesinden biri</b> (${a ? 'varlık grubunda uygun ' + gr.of + ' hisse içinde ' + gr.rank + '. sırada; sistem ilk 3\'ü alır' : 'faaliyet grubunda uygun ' + gr.of + ' hisse içinde ' + gr.rank + '. sırada; sistem ilk 2\'yi alır'}).`
+    : `Bu hafta seçilmedi: ${a ? 'varlık' : 'faaliyet'} grubunda uygun ${gr.of} hisse içinde ${gr.rank}. sırada (sistem ${a ? 'ilk 3' : 'ilk 2'}'yi alır; aynı gruptan tek hisse kuralı sırayı kaydırabilir).`);
+  // 3) fiyatı değere ne yaklaştırabilir
+  if (!red && x.potential > 0) {
+    if (a) {
+      o.push.push('Gayrimenkul ya da iştirak satışı: defter değerine yakın bir satış, değerin nakde döndüğünü gösterir.');
+      o.push.push('Kira gelirinin ve temettünün artması; ekspertiz raporlarında değer artışı.');
+      if (x.type === 'holding') o.push.push('Borsadaki iştiraklerin yükselmesi ya da holding yapısının sadeleşmesi (birleşme, iştirak halka arzı).');
+      o.push.push('Gayrimenkul ve holding hisselerine genel ilginin dönmesi (faiz indirimi dönemleri bu hisselere çoğu zaman yarar).');
+    } else {
+      const nr = nextReport(x.period_end);
+      o.push.push(`Kârın modelin beklediği hızda gelmesi. Sistemin varsaydığı gelecek yıl kârı ${N(d.forward_profit || x.value_total / 16)}${d.ttm_profit != null ? `, son 12 ayın gerçeği ${N(d.ttm_profit)}` : ''}.`);
+      if (nr) o.push.push(`Sıradaki bilanço (${nr.end} dönemi) genelde ${nr.due} civarı KAP'ta: kâr artışı orada görünürse fiyat tepki verebilir.`);
+      o.push.push('Yeni sipariş/sözleşme, kapasite artışı ya da temettü haberleri.');
+    }
+  }
+  // 5) gerekçeyi bozan durumlar
+  if (red) { o.breaks.push('Fiyattaki düşüşün nedeni büyük olasılıkla aşağıdaki kırmızı bayrak. Bayrak kalkmadan (KAP\'ta süreç kapanış ya da olumlu karar bildirimi) sistem bu hisseyi seçmez.'); return o; }
+  if (c.ret1y != null && c.ret1y <= -0.5 && x.potential > 0) o.breaks.push(`<b>Fiyat 1 yılda ${pct(c.ret1y)}.</b> Bu kadar sert düşüş çoğu zaman piyasanın bilançoda görünmeyen bir şeyi fiyatladığını gösterir: ortaklık sorunu, sulanma (bedelli/tahsisli artırım), dava, büyük ortağın satışı, finansman sıkıntısı. Düşüşün nedenini KAP bildirimlerinde ve haberlerde bulmadan alım yapmayın.`);
+  if (c.off_low != null && c.off_low < 0.05 && x.potential > 0) o.breaks.push('Fiyat 52 haftanın dibinde; düşüş henüz durmamış olabilir. Parayı dilimlere bölmek bu riski azaltır.');
+  if (a) o.breaks.push('Bir sonraki bilançoda özkaynağın düşmesi (değer kaybı, zarar), sermaye artırımıyla payın sulanması ya da varlık satışlarının defter değerinin altında kalması.');
+  else {
+    const k = d.forward_profit > 0 && d.ttm_profit > 0 ? d.forward_profit / d.ttm_profit : null;
+    if (k && k >= 2) o.breaks.push(`<b>Sistemin beklediği kâr, son 12 ayın gerçek kârının <span class="num">${x2(k)}</span> katı.</b> Model faaliyet kârından hesaplıyor; finansman gideri, kur farkı ve enflasyon kaybı gibi kalemler gerçek kârı düşük tutuyorsa bu kâr gelmeyebilir ve model değeri düşer.`);
+    else if (d.ttm_profit != null && d.ttm_profit <= 0 && d.forward_profit > 0) o.breaks.push('<b>Son 12 ayda zarar var</b> ama model gelecek yıl kâr varsayıyor; kâra dönüş gecikirse değer düşer.');
+    o.breaks.push('Bir sonraki bilançoda kârın modelin beklediğinin çok altında kalması; büyümenin tek seferlik bir işten (ihale, kur farkı, varlık satışı) gelmiş olması.'); }
+  o.breaks.push('Sistem her hafta yeniden hesaplar. Hisse listeden çıkarsa ya da kalite kontrolü sarıdan kırmızıya dönerse gerekçe zayıflamış demektir.');
+  return o;
+}
+function ownersHTML(x) {
+  const R = (x.ctx || {}).owners; if (!R || !R.length) return '';
+  const isOther = r => /^D[İI]ĞER/i.test(r[0]);
+  const showVote = R.some(r => Math.abs(r[2] - r[1]) > 0.005);
+  const name = r => isOther(r) ? 'Diğer (halka açık kısım ve %5 altı ortaklar)' : esc(r[0]);
+  const link = r => r[3] && ALL.some(z => z.ticker === r[3]) ? ` <button class="olink" data-t="${esc(r[3])}">${esc(r[3])} →</button>` : r[3] ? ` <span class="chip">${esc(r[3])}</span>` : '';
+  const notes = [], main = R.filter(r => !isOther(r)), top = main.slice().sort((a, b) => b[2] - a[2])[0];
+  if (top && top[2] >= 0.5) notes.push(`<b>Yönetim kontrolü tek ortakta:</b> ${esc(top[0])}, oy payı <span class="num">${pc0(top[2])}</span>.`);
+  for (const r of main) if (r[2] - r[1] >= 0.10) notes.push(`<b>İmtiyazlı pay:</b> ${esc(r[0])} sermayenin <span class="num">${pc0(r[1])}</span> kadarına sahip ama oy payı <span class="num">${pc0(r[2])}</span>. Küçük ortağın kararlardaki ağırlığı sermaye payından az.`);
+  const lp = main.filter(r => r[3]);
+  if (lp.length) notes.push(`<b>Ana ortağı borsada:</b> ${lp.map(r => esc(r[3])).join(', ')}. Ana ortağın durumu (borcu, sermaye ihtiyacı, KAP olayları) bu hisseyi de etkiler.`);
+  const oth = R.find(isOther);
+  if (oth && oth[1] < 0.15) notes.push(`Diğer ortakların payı düşük (<span class="num">${pc0(oth[1])}</span>): halka açık kısım küçük, fiyat sert hareket edebilir.`);
+  return `<section class="own"><h3>Ana ortaklar</h3>
+    <table><tr><th>Ortak</th><th>Sermaye</th>${showVote ? '<th>Oy</th>' : ''}</tr>
+    ${R.map(r => `<tr${isOther(r) ? ' class="oth"' : ''}><td>${name(r)}${link(r)}</td><td>${pc0(r[1])}</td>${showVote ? `<td>${pc0(r[2])}</td>` : ''}</tr>`).join('')}</table>
+    ${notes.length ? `<ul>${notes.map(n => `<li>${n}</li>`).join('')}</ul>` : ''}
+    <p class="fine">KAP ortaklık yapısı (sermayede %5 ve üzeri doğrudan pay sahipleri)${D.owners_asof ? ', ' + DATE(D.owners_asof) + ' itibarıyla' : ''}.</p></section>`;
+}
+/* "Şirketin durumu": bilanço ve gelir tablosundan otomatik güçlü / zayıf taraflar (her hafta, her hisse). Gelir kalemleri
+   raporun kendi dönemiyle (yılbaşından bugüne) ve geçen yılın aynı dönemiyle karşılaştırılır. */
+function companyHTML(x) {
+  const F = (x.ctx || {}).fin; if (!F) return '';
+  const c = x.ctx || {}, a = x.group === 'VARLIK', mc = F.mcap || x.mcap, T = esc(x.ticker);
+  const per = F.months === 12 ? 'yıllık' : F.months ? `ilk ${F.months} ay` : 'son dönem';
+  const yr = F.period_end ? String(F.period_end).slice(0, 4) : '';
+  const ch = (v, p) => v != null && p != null && p > 0 ? v / p - 1 : null;
+  const share = (v, b) => v != null && b ? v / b : null;
+  const W = [], S = [], K = [], C = [], WL = [], SL = [];
+  const w = (k, t) => { W.push(t); WL.push(k); }, g = (k, t) => { S.push(t); SL.push(k); };
+  // satış ve kâr
+  const rg = ch(F.rev, F.rev_prior);
+  if (rg != null && rg <= -0.10) w('satışlar düşüyor', `<b>Satışlar düşüyor:</b> ${yr} ${per} hasılat ${N(F.rev)}, geçen yılın aynı döneminde ${N(F.rev_prior)} (<span class="num">${pct(rg)}</span>).`);
+  else if (rg != null && rg >= 0.10) g('satışlar artıyor', `<b>Satışlar artıyor:</b> ${yr} ${per} hasılat ${N(F.rev)}, geçen yıl aynı dönem ${N(F.rev_prior)} (<span class="num">${pct(rg)}</span>).`);
+  if (F.gross != null && F.gross < 0 && !a) w('ana iş brüt zararda', `<b>Brüt zarar:</b> ${per} satışların maliyeti satış gelirini aştı (brüt zarar ${N(-F.gross)}). Ana iş para kaybediyor.`);
+  else if (F.op != null && F.op < 0 && !a) w('esas faaliyetler zararda', `<b>Esas faaliyetler zararda:</b> finansman öncesi faaliyet sonucu ${per} ${N(F.op)}.`);
+  if (F.gross > 0 && F.fin_exp != null && -F.fin_exp > F.gross && !a) w('faiz yükü ağır', `<b>Faiz yükü ağır:</b> ${per} finansman gideri ${N(-F.fin_exp)}, brüt kârın <span class="num">${x2(-F.fin_exp / F.gross)}</span> katı.`);
+  const ann = F.np != null && F.months ? F.np * 12 / F.months : null, ey = share(ann, mc);
+  if (F.np != null && F.np <= 0) w('net zarar', `<b>Net zarar:</b> ${per} ${N(F.np)}${F.np_prior != null ? ` (geçen yıl aynı dönem ${N(F.np_prior)})` : ''}.`);
+  else if (ey != null && ey < 0.03) w('kâr çok az', `<b>Kâr çok az:</b> ${per} net kâr ${N(F.np)}${F.np_prior != null ? ` (geçen yıl aynı dönem ${N(F.np_prior)})` : ''}; piyasa değerine göre neredeyse yok.`);
+  else if (ey != null && ey >= 0.10) g('kârına göre ucuz', `<b>Kârına göre ucuz:</b> ${per} net kâr ${N(F.np)}; yıllığa çevrilince piyasa değerinin <span class="num">%${Math.round(100 * ey)}</span> kadarı.`);
+  const pg = F.np > 0 && F.np_prior > 0 ? F.np / F.np_prior - 1 : null;
+  if (pg != null && pg <= -0.30) w('kâr düşüyor', `<b>Kâr düşüyor:</b> ${per} net kâr ${N(F.np)}, geçen yıl aynı dönem ${N(F.np_prior)} (<span class="num">${pct(pg)}</span>).`);
+  else if (pg != null && pg >= 0.30) g('kâr artıyor', `<b>Kâr artıyor:</b> ${per} net kâr ${N(F.np)}, geçen yıl aynı dönem ${N(F.np_prior)} (<span class="num">${pct(pg)}</span>).`);
+  else if (F.np > 0 && F.np_prior != null && F.np_prior <= 0 && ey != null && ey >= 0.03) g('zarardan kâra geçti', `<b>Zarardan kâra geçti:</b> ${per} net kâr ${N(F.np)}, geçen yıl aynı dönem ${N(F.np_prior)}.`);
+  // bilanço
+  const nd = F.debt != null && F.cash != null ? F.debt - F.cash : null;
+  if (nd != null && nd < 0 && -nd >= 0.1 * mc) g('borçtan fazla nakit', `<b>Net nakit:</b> nakit ${N(F.cash)}, kredi borcu ${N(F.debt)}; borçtan fazla nakit ${N(-nd)}.`);
+  else if (nd != null && nd >= mc) w('borç yüksek', `<b>Borç yüksek:</b> net kredi borcu ${N(nd)}, piyasa değerinin <span class="num">${x2(nd / mc)}</span> katı.`);
+  const mshare = share(F.mach, F.equity);
+  if (mshare != null && mshare >= 0.35 && !a) w('özkaynağın çoğu makine', `<b>Özkaynağın büyük kısmı makine-tesis:</b> ${N(F.mach)} (özkaynağın <span class="num">%${Math.round(100 * mshare)}</span>). Ekspertiz makineyi "yeniden alsan kaça mal olur" diye değerler; satışta bu değeri bulmaz.`);
+  const rr = share(F.rel_recv, mc);
+  if (rr != null && rr >= 0.15) w('grup şirketinden yüksek alacak', `<b>Grup şirketlerinden alacak:</b> ${N(F.rel_recv)} (ticari ve diğer; piyasa değerinin <span class="num">%${Math.round(100 * rr)}</span>). Grup içinde kalan para; tahsil edilip edilmediği izlenmeli.`);
+  const extra = (F.ip || 0) + (F.eqinv || 0), es = share(extra, mc);
+  if (!a && es != null && es >= 0.3) g('üretim dışı gayrimenkul ve iştirakler', `<b>Üretim dışı varlık:</b> yatırım amaçlı gayrimenkul ${N(F.ip || 0)}${F.eqinv ? ` ve iştirakler ${N(F.eqinv)}` : ''}; toplam piyasa değerinin <span class="num">%${Math.round(100 * es)}</span>'i kadar.`);
+  if (F.reval && F.equity && F.reval >= 0.1 * F.equity) K.push(`Arsa/bina${mshare ? '/makine' : ''} ekspertizle yeniden değerlenmiş (özkaynakta yeniden değerleme artışı ${N(F.reval)}). Bilançodaki değerler zaten ekspertiz değeri; ayrıca gizli değer beklenmemeli.`);
+  if (!a && !String((x.detail || {}).engine || '').startsWith('MK-FINAL')) K.push('Kâr tahmini yapılamadığı için model değeri özkaynaktan hesaplandı (yedek yöntem). Özkaynak makine ya da tek seferlik değer artışlarıyla şişmişse model değeri gerçeği olduğundan iyi gösterir.');
+  if (F.cfo != null && F.cfo < 0) w('faaliyetler nakit tüketiyor', `<b>Faaliyetlerden nakit çıkışı:</b> ${per} işletme faaliyetleri ${N(F.cfo)} nakit tüketti.`);
+  // tasfiye
+  const L = F.lv;
+  if (L && L.mid > 0) {
+    const t = `Tasfiye değeri (varlıklar iskontolu satılsa, borçlar ödense): kötümser ${N(L.low)} · orta ${N(L.mid)} · iyimser ${N(L.high)}; piyasa değeri ${N(mc)}.`;
+    if (L.low >= mc) g('tasfiye değeri piyasa değerinin üstünde', `<b>Kötümser tasfiye değeri bile piyasa değerinin üstünde.</b> ${t}`);
+    else if (L.mid >= mc) K.push(t + ' Piyasa, kötümser ile orta senaryo arasında fiyatlıyor.');
+    else K.push(t + ' Piyasa değeri orta senaryonun da üstünde: ucuzluk varlıklardan çok kârdan bekleniyor.');
+  }
+  // fiyatı ne değiştirebilir
+  if (!a && (F.gross < 0 || F.op < 0)) C.push('Ana işin yeniden kâra dönmesi (bir sonraki bilançolarda brüt ve esas faaliyet kârı).');
+  if (!a && es != null && es >= 0.3) C.push('Üretim dışı gayrimenkulün satılması ya da kiraya verilip nakde dönmesi; iştirakten temettü.');
+  if (nd != null && nd > 0 && (nd >= 0.5 * mc || (F.fin_exp && F.gross > 0 && -F.fin_exp > 0.5 * F.gross))) C.push('Borcun azalması ya da faizlerin düşmesi.');
+  if (rr != null && rr >= 0.15) C.push('Grup şirketinden alacağın tahsil edilmesi.');
+  if (a) C.push('Gayrimenkul ya da iştirak satışı, kira ve temettü artışı; ekspertiz raporlarında değer artışı.');
+  else if (!C.length) C.push('Kârın modelin beklediği hızda gelmesi; yeni sipariş/sözleşme ya da temettü.');
+  if (!W.length && !S.length && !K.length) return '';
+  const top = L => L.slice(0, 2).join(' ve ');
+  const sum = WL.length && SL.length ? `${T}: güçlü yanı ${top(SL)}; zayıf yanı ${top(WL)}.` : WL.length ? `${T}: öne çıkan zayıflıklar ${top(WL)}.` : SL.length ? `${T}: öne çıkan güçlü yanlar ${top(SL)}.` : '';
+  const li = L => `<ul>${L.map(s => `<li>${s}</li>`).join('')}</ul>`;
+  return `<section class="comp"><h3>Şirketin durumu</h3>${sum ? `<p class="lead">${sum}</p>` : ''}
+    ${S.length ? `<h4 class="g">Güçlü taraflar</h4>${li(S)}` : ''}${W.length ? `<h4 class="b">Zayıf taraflar</h4>${li(W)}` : ''}
+    ${K.length ? `<h4>Bilinmesi gerekenler</h4>${li(K)}` : ''}${C.length ? `<h4>Fiyatı ne değiştirebilir</h4>${li(C)}` : ''}
+    <p class="fine">Otomatik özet: ${yr} ${per} bilanço ve gelir tablosu (KAP), geçen yılın aynı dönemiyle karşılaştırma. Bölüm bazında (hangi iş kolu kâr/zarar ediyor) ve alacaklı şirketin adı gibi ayrıntılar dipnotlardadır; KAP'tan kontrol edin.</p></section>`;
+}
+function thesisHTML(x) {
+  const o = thesis(x), li = L => L.length ? `<ul>${L.map(s => `<li>${s}</li>`).join('')}</ul>` : '';
+  return `<section class="thesis ${o.tone}"><h3>${o.title}</h3><p class="lead">${o.lead}</p>
+    ${o.facts.length ? `<h4>Rakamlarla</h4>${li(o.facts)}` : ''}
+    ${o.push.length && !(x.ctx || {}).fin ? `<h4>Fiyatı değere ne yaklaştırabilir</h4>${li(o.push)}` : ''}
+    ${o.breaks.length ? `<h4>Gerekçeyi bozan durumlar</h4>${li(o.breaks)}` : ''}
+    <p class="fine">Bu metin sistemin hesabını sade dille anlatır. Yatırım tavsiyesi değildir.</p></section>`;
 }
 
 function scaleHTML(x) {
@@ -441,6 +641,9 @@ function openDetail(t, push = true) {
     <div class="trio"><div class="cell"><span>Fiyat</span><b>${fx(x.price)}</b></div><div class="cell v"><span>Model değeri</span><b>${fx(x.value_ps)}</b></div><div class="cell"><span>Model değerine fark</span><b class="${x.potential >= 0 ? 'up' : 'down'}">${pct(x.potential)}</b></div></div>
     ${pfBlock(x)}
     ${scaleHTML(x)}
+    ${thesisHTML(x)}
+    ${companyHTML(x)}
+    ${ownersHTML(x)}
     <section class="qc ${e.qlevel === 'KIRMIZI' ? 'bad' : e.qlevel === 'SARI' ? 'mid' : 'ok'}"><h3>Kalite kontrolü: ${e.qlevel === 'KIRMIZI' ? '⛔ KIRMIZI — sistem bu hisseyi seçmez' : e.qlevel === 'SARI' ? '⚠ SARI — okuyup kontrol edin' : '✓ TEMİZ'}</h3>
       ${e.quality.length ? `<ul>${e.quality.map(([l, m]) => `<li class="${l === 'KIRMIZI' ? 'r' : 'y'}"><b>${l}</b> ${esc(m)}</li>`).join('')}</ul>` : '<p>Bilanço içeriği (sermaye avansı, menkul kıymet, ertelenmiş vergi, ilişkili taraf alacağı, özkaynak sıçraması), son 6 ayın KAP olayları (SPK, kayyım/TMSF, konkordato, dava, bedelli/tahsisli artırım), grup şirketleri ve art arda taban kontrol edildi; sorun bulunmadı. Bu otomatik bir taramadır, KAP\'ı okumanın yerini tutmaz.</p>'}</section>
     <section class="why"><h3>${e.qlevel === 'KIRMIZI' ? 'Formül neden ucuz gösteriyor (kırmızı bayrak nedeniyle güvenilmez)' : x.potential > 0 ? 'Neden ucuz?' : 'Neden pahalı?'}</h3><p class="lead">${e.lead}</p><ul>${e.why.map(s => `<li>${s}</li>`).join('')}</ul></section>
@@ -471,6 +674,7 @@ function render() {
 
 document.addEventListener('click', e => {
   const r = e.target.closest('.row'); if (r) { openDetail(r.dataset.t); return; }
+  const ol = e.target.closest('.olink'); if (ol) { openDetail(ol.dataset.t); return; }
   const tb = e.target.closest('.tabs button'); if (tb) { tab = tb.dataset.tab; render(); return; }
   const pb = e.target.closest('[data-pf]');
   if (pb) {
@@ -503,12 +707,12 @@ if (TG) {
   let data = null;
   try { const raw = $('#embedded').textContent.trim(); if (raw.startsWith('{')) data = JSON.parse(raw); } catch (e) { }
   if (!data) {
-    for (const u of ['final_snapshot.json']) { try { const r = await fetch(u, {cache: 'no-store'}); if (r.ok) { data = await r.json(); if (data.picks) break; } } catch (e) { } }
+    for (const u of ['/api/final', 'final_snapshot.json']) { try { const r = await fetch(u, {cache: 'no-store'}); if (r.ok) { data = await r.json(); if (data.picks) break; } } catch (e) { } }
   }
   if (data && data.picks) {
     prep(data);
     $('#stamp').textContent = `${DATE(data.asof)} kapanışı · ${ALL.length} hisse değerlendi`;
-  } else $('#stamp').textContent = 'Veri yüklenemedi. final_snapshot.json dosyasının yüklendiğini kontrol edin.';
+  } else $('#stamp').textContent = 'Veri bulunamadı. Bilgisayarda 05_MK_FINAL_WINDOWS.bat çalıştırın.';
   render();
   pfInit();
   const t = location.hash.slice(1); if (t && ALL.some(r => r.ticker === t)) openDetail(t, false);
