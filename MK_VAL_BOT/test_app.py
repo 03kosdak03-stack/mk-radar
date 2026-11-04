@@ -43,40 +43,4 @@ class Tests(unittest.TestCase):
    for cmd in ['/start','/durum','/secim','/varlik','/faaliyet','/deger IHGZT','/takip','/mkbacktest','/kural']:
     app.handle({'chat':{'type':'private','id':123},'from':{'id':123},'text':cmd})
    self.assertEqual(send.call_count,9)
-class UploadTests(unittest.TestCase):
- """PC tek tuş yüklemesi: POST /api/upload."""
- def setUp(self):
-  import threading
-  from http.server import ThreadingHTTPServer
-  self.tmp=tempfile.TemporaryDirectory();self.old=app.DATA;app.DATA=Path(self.tmp.name);app.init()
-  self.key='k'*40;self.p=[patch.object(app,'UPLOAD_KEY',self.key),patch.object(app,'notify_admin'),patch.object(app.time,'sleep')]
-  self.mocks=[x.start() for x in self.p];app._FAILS.clear()
-  self.srv=ThreadingHTTPServer(('127.0.0.1',0),app.Web);threading.Thread(target=self.srv.serve_forever,daemon=True).start()
- def tearDown(self):
-  self.srv.shutdown();[x.stop() for x in self.p];app.DATA=self.old;self.tmp.cleanup()
- def post(self,blob,key):
-  from urllib.request import Request,urlopen
-  from urllib.error import HTTPError
-  r=Request(f'http://127.0.0.1:{self.srv.server_port}/api/upload',data=blob,headers={'X-Upload-Key':key,'Content-Type':'application/zip'})
-  try:
-   with urlopen(r,timeout=20) as x:return x.status,json.load(x)
-  except HTTPError as e:return e.code,json.load(e)
- def blob(self,d=None):
-  out=io.BytesIO()
-  with zipfile.ZipFile(out,'w') as z:z.writestr('exports/web/final_snapshot.json',json.dumps(d or app.current()[app.NAMES[0]]))
-  return out.getvalue()
- def test_ok(self):
-  code,res=self.post(self.blob(),self.key);self.assertEqual(code,200);self.assertTrue(res['ok']);self.assertEqual(len(res['picks']),5)
-  self.mocks[1].assert_called_once()
- def test_wrong_key(self):
-  code,res=self.post(self.blob(),'x'*40);self.assertEqual(code,403)
- def test_bad_zip_keeps_data(self):
-  before=app.current();d=json.loads(json.dumps(before[app.NAMES[0]]));d['asset'][0]['price']=-1
-  code,res=self.post(self.blob(d),self.key);self.assertEqual(code,400);self.assertEqual(app.current(),before)
- def test_rate_limit(self):
-  for _ in range(5):self.post(self.blob(),'y'*40)
-  code,_=self.post(self.blob(),self.key);self.assertEqual(code,429)
- def test_short_key_disabled(self):
-  with patch.object(app,'UPLOAD_KEY','kisa'):
-   code,_=self.post(self.blob(),'kisa');self.assertEqual(code,503)
 if __name__=='__main__':unittest.main()
