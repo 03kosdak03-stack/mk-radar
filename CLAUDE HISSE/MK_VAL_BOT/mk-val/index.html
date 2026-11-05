@@ -697,6 +697,16 @@ $('#back').addEventListener('click', closeDetail);
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#sheet').classList.contains('open')) closeDetail(); });
 window.addEventListener('hashchange', () => { const t = location.hash.slice(1); if (t && ALL.some(r => r.ticker === t)) openDetail(t, false); else closeDetail(); });
 
+// Telegram içinde her açılışta tam ekran (yarım pencere değil); initData olmasa da çalışır
+(function () {
+  const W = window.Telegram && window.Telegram.WebApp;
+  if (!W) return;
+  const full = () => { try { if (!W.isExpanded) W.expand(); } catch (e) { } };
+  try { W.ready(); W.expand(); } catch (e) { }
+  try { if (W.disableVerticalSwipes) W.disableVerticalSwipes(); } catch (e) { }
+  setTimeout(full, 300); setTimeout(full, 1200);
+  try { W.onEvent('viewportChanged', ev => { if (ev && ev.isStateStable) full(); }); } catch (e) { }
+})();
 if (TG) {
   try {
     TG.ready(); TG.expand();
