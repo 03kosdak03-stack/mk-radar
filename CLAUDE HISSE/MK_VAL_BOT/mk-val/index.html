@@ -28,6 +28,8 @@
   --value:#3ccb9c; --value-soft:#143328; --gold:#e6b452; --gold-soft:#372a12; --bad:#f2907d; --bad-soft:#3a1d18;
   --asset:#b9a5f5; --asset-soft:#251f3c; --op:#72b8ec; --op-soft:#132a3c; color-scheme:dark}
 *{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{background:var(--bg)}
 body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
 .wrap{max-width:720px;margin:0 auto;padding-block:14px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
@@ -154,9 +156,9 @@ footer{color:var(--muted);font-size:.74rem}
 .olink{font:inherit;font-size:.74rem;font-weight:700;color:var(--op);background:var(--op-soft);border:0;border-radius:999px;padding:1px 8px;cursor:pointer;white-space:nowrap}
 .src a{color:var(--op);word-break:break-all;font-size:.84rem}
 .src p{margin:0 0 6px;font-size:.84rem;color:var(--muted)}
-.wrap{padding-top:calc(14px + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));padding-bottom:calc(48px + var(--tg-safe-area-inset-bottom, 0px) + var(--tg-content-safe-area-inset-bottom, 0px))}
-.tabs{top:calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px))}
-.sheet{padding-top:calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px))}
+html.tgfs .wrap{padding-top:calc(14px + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));padding-bottom:calc(48px + var(--tg-safe-area-inset-bottom, 0px) + var(--tg-content-safe-area-inset-bottom, 0px))}
+html.tgfs .tabs{top:calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px))}
+html.tgfs .sheet{padding-top:calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px))}
 </style>
 
 <div class="wrap" lang="tr">
@@ -703,6 +705,9 @@ window.addEventListener('hashchange', () => { const t = location.hash.slice(1); 
   if (!W) return;
   const full = () => { try { if (!W.isExpanded) W.expand(); } catch (e) { } };
   try { W.ready(); W.expand(); } catch (e) { }
+  // Telegram'ın cihaz güvenli alan boşluğu yalnız gerçek tam ekran modunda uygulanır; normal açılışta üstte boşluk kalmaz
+  const fs = () => document.documentElement.classList.toggle('tgfs', !!W.isFullscreen);
+  fs(); try { W.onEvent('fullscreenChanged', fs); } catch (e) { }
   try { if (W.disableVerticalSwipes) W.disableVerticalSwipes(); } catch (e) { }
   setTimeout(full, 300); setTimeout(full, 1200);
   try { W.onEvent('viewportChanged', ev => { if (ev && ev.isStateStable) full(); }); } catch (e) { }
