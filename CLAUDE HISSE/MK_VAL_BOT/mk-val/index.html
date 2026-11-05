@@ -708,6 +708,11 @@ window.addEventListener('hashchange', () => { const t = location.hash.slice(1); 
   // Telegram'ın cihaz güvenli alan boşluğu yalnız gerçek tam ekran modunda uygulanır; normal açılışta üstte boşluk kalmaz
   const fs = () => document.documentElement.classList.toggle('tgfs', !!W.isFullscreen);
   fs(); try { W.onEvent('fullscreenChanged', fs); } catch (e) { }
+  // Telefonda gerçek tam ekran (Telegram 8.0+): üstteki sohbet şeridi ve başlık kalkar, Kapat/menü düğmeleri üstte kalır
+  const mobile = ['ios', 'android', 'android_x'].includes(W.platform);
+  const goFull = () => { try { if (mobile && W.requestFullscreen && !W.isFullscreen && (!W.isVersionAtLeast || W.isVersionAtLeast('8.0'))) W.requestFullscreen(); } catch (e) { } };
+  goFull(); setTimeout(goFull, 400);
+  try { W.onEvent('safeAreaChanged', fs); W.onEvent('contentSafeAreaChanged', fs); } catch (e) { }
   try { if (W.disableVerticalSwipes) W.disableVerticalSwipes(); } catch (e) { }
   setTimeout(full, 300); setTimeout(full, 1200);
   try { W.onEvent('viewportChanged', ev => { if (ev && ev.isStateStable) full(); }); } catch (e) { }
