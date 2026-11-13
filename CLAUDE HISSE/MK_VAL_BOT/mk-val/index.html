@@ -514,8 +514,7 @@ function thesis(x) {
     o.facts.push(`<b>Kâr gidişi:</b> son 12 ay net kâr ${N(d.ttm_profit)}, bir önceki 12 ay ${N(d.ttm_profit_prior)}${ch != null ? ` (<span class="num">${pct(ch)}</span>)` : ''}.`);
   }
   const gr = groupRank(x);
-  if (gr && !red && x.potential > 0) o.facts.push(PICKS.has(x.ticker) ? `<b>Bu haftanın 5 hissesinden biri</b> (${a ? 'varlık grubunda uygun ' + gr.of + ' hisse içinde ' + gr.rank + '. sırada; sistem ilk 3\'ü alır' : 'faaliyet grubunda uygun ' + gr.of + ' hisse içinde ' + gr.rank + '. sırada; sistem ilk 2\'yi alır'}).`
-    : `Bu hafta seçilmedi: ${a ? 'varlık' : 'faaliyet'} grubunda uygun ${gr.of} hisse içinde ${gr.rank}. sırada (sistem ${a ? 'ilk 3' : 'ilk 2'}'yi alır; aynı gruptan tek hisse kuralı sırayı kaydırabilir).`);
+  if (gr && !red && x.potential > 0 && PICKS.has(x.ticker)) o.facts.push( `<b>Bu haftanın 5 hissesinden biri</b> (${a ? 'varlık grubunda uygun ' + gr.of + ' hisse içinde ' + gr.rank + '. sırada; sistem ilk 3\'ü alır' : 'faaliyet grubunda uygun ' + gr.of + ' hisse içinde ' + gr.rank + '. sırada; sistem ilk 2\'yi alır'}).`);
   // 3) fiyatı değere ne yaklaştırabilir
   if (!red && x.potential > 0) {
     if (a) {
@@ -534,13 +533,11 @@ function thesis(x) {
   if (red) { o.breaks.push('Fiyattaki düşüşün nedeni büyük olasılıkla aşağıdaki kırmızı bayrak. Bayrak kalkmadan (KAP\'ta süreç kapanış ya da olumlu karar bildirimi) sistem bu hisseyi seçmez.'); return o; }
   if (c.ret1y != null && c.ret1y <= -0.5 && x.potential > 0) o.breaks.push(`<b>Fiyat 1 yılda ${pct(c.ret1y)}.</b> Bu kadar sert düşüş çoğu zaman piyasanın bilançoda görünmeyen bir şeyi fiyatladığını gösterir: ortaklık sorunu, sulanma (bedelli/tahsisli artırım), dava, büyük ortağın satışı, finansman sıkıntısı. Düşüşün nedenini KAP bildirimlerinde ve haberlerde bulmadan alım yapmayın.`);
   if (c.off_low != null && c.off_low < 0.05 && x.potential > 0) o.breaks.push('Fiyat 52 haftanın dibinde; düşüş henüz durmamış olabilir. Parayı dilimlere bölmek bu riski azaltır.');
-  if (a) o.breaks.push('Bir sonraki bilançoda özkaynağın düşmesi (değer kaybı, zarar), sermaye artırımıyla payın sulanması ya da varlık satışlarının defter değerinin altında kalması.');
-  else {
+  if (!a) {
     const k = d.forward_profit > 0 && d.ttm_profit > 0 ? d.forward_profit / d.ttm_profit : null;
     if (k && k >= 2) o.breaks.push(`<b>Sistemin beklediği kâr, son 12 ayın gerçek kârının <span class="num">${x2(k)}</span> katı.</b> Model faaliyet kârından hesaplıyor; finansman gideri, kur farkı ve enflasyon kaybı gibi kalemler gerçek kârı düşük tutuyorsa bu kâr gelmeyebilir ve model değeri düşer.`);
     else if (d.ttm_profit != null && d.ttm_profit <= 0 && d.forward_profit > 0) o.breaks.push('<b>Son 12 ayda zarar var</b> ama model gelecek yıl kâr varsayıyor; kâra dönüş gecikirse değer düşer.');
-    o.breaks.push('Bir sonraki bilançoda kârın modelin beklediğinin çok altında kalması; büyümenin tek seferlik bir işten (ihale, kur farkı, varlık satışı) gelmiş olması.'); }
-  o.breaks.push('Sistem her hafta yeniden hesaplar. Hisse listeden çıkarsa ya da kalite kontrolü sarıdan kırmızıya dönerse gerekçe zayıflamış demektir.');
+  }
   return o;
 }
 function ownersHTML(x) {
