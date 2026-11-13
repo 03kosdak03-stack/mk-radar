@@ -267,6 +267,9 @@ function viewHow() {
   <b>Faaliyet şirketleri</b>: değer = 16 × gelecek yıl net kârı. Kâr tahmin edilemeyen (zarar eden, finans) şirketlerde özkaynak + kârlılık yöntemi kullanılır.<br><br>
   <b>Kural:</b> varlık grubundan en ucuz 3 + faaliyet grubundan en ucuz 2 = 5 hisse, eşit para. Önerilen kullanım: parayı 4'e bölüp her çeyrek (Ocak, Nisan, Temmuz, Ekim) o haftanın 5 hissesine bir dilim yatırmak; satış zamanı sizin kararınız. Günlük işlemi 20 bin $ altındaki ve kırmızı bayraklı hisse seçilmez.<br><br>
   <b>Model değerine göre fark</b> = model değeri / fiyat − 1. Beklenen getiri veya gerçekleşme olasılığı değildir; gerçekleşme süresi belirsizdir ve model değeri düşebilir. Hedef fiyat verilmez; ne zaman satacağınız size kalmış.</div>
+  <div class="note"><b>Değerli ölçütler</b> (hisse detayında; yalnız bilgi, sistemin değerine ve sıralamasına katılmaz):<br>
+  <b>Küçük sermaye</b>: ödenmiş sermaye 400 milyon TL altı. · <b>Güçlü yedek</b>: yedekler (özkaynak − ödenmiş sermaye) piyasa değerinden büyük. · <b>YDF (bedelsiz potansiyeli)</b>: yedek / ödenmiş sermaye; enflasyon muhasebesi (2023 sonrası) bu oranı şişirir ve bedelsiz şirket değerini artırmaz, bu yüzden ✓/✗ verilmez. · <b>Borçsuzluk</b>: nakit, finansal borçtan fazla (net nakit). · <b>Kâr marjı</b>: net kâr / hasılat (son bilanço dönemi) %10 ve üstü. · <b>Balon değil</b>: son 1 yılda fiyat %100'den fazla artmamış.<br>
+  2019–2025 testi: ödenmiş sermayesi en küçük %20'lik hisseler en büyük %20'yi her başlangıç ayında açık ara geçti (Nisan 110 kat / 31 kat). Bu ölçütlerin hepsini tutanlardan seçim ise değişken çıktı (Nisan 58, Ocak 189, Temmuz 204, Ekim 53 kat) ve toplamda sistemin gerisinde kaldı.</div>
   <div class="note"><b>Geriye dönük test — MK Final 1.4</b>: 3 varlık + 2 faaliyet; gizli değer sıralamada değil (ek senaryo); kırmızı bayraklı hisse yok; aynı gruptan tek hisse; pay sayısı doğrulanamayan adımda en yüksek piyasa değeri varsayılır (hisse ancak öyle de ucuzsa seçilir); seçim günün kapanışından sonra, alım ertesi gün.<br>
   12 ay tutma, başlangıç ayına göre 7 yıl: Nisan <b>418 kat</b> · Ocak 225 · Temmuz 128 · Ekim 65 (4 dilim ortalaması ≈ 209) — XU100 13-15 kat. Yıl içi en kötü düşüş −%53.<br>
   <b>Değerine gelince satıp parayı haftanın yeni hissesine yatırmak</b>: Nisan 250 · Ocak 156 · Temmuz 96 · Ekim 50 kat (ort. ≈ 138). Her başlangıç ayında 12 ay tutmaktan düşük: getirinin büyük kısmı model değerini aşıp yükselmeye devam eden hisselerden geldi.<br>
@@ -569,7 +572,7 @@ function olcutHTML(x) {
   const yed = eq != null && pcap ? eq - pcap : null;
   R.push(['Küçük sermaye', pcap ? N(pcap) : '—', pcap ? (pcap < 400e6 ? 'y' : 'n') : 'b', pcap ? 'Ödenmiş sermaye 400 milyon TL altı mı' : 'Bir sonraki haftalık güncellemede görünür']);
   R.push(['Güçlü yedek', yed != null ? N(yed) : '—', yed != null ? (yed > mc ? 'y' : 'n') : 'b', yed != null ? `Yedekler (özkaynak − sermaye) piyasa değerinin <span class="num">${x2(yed / mc)}</span> katı` : 'Özkaynak − ödenmiş sermaye']);
-  R.push(['Bedelsiz potansiyeli', yed != null && pcap ? `<span class="num">%${new Intl.NumberFormat('tr-TR', {maximumFractionDigits: 0}).format(100 * yed / pcap)}</span>` : '—', 'b', 'Yedek / ödenmiş sermaye. Enflasyon muhasebesi (2023 sonrası) bu oranı şişirir; bedelsiz şirket değerini artırmaz']);
+  R.push(['YDF (bedelsiz potansiyeli)', yed != null && pcap ? `<span class="num">%${new Intl.NumberFormat('tr-TR', {maximumFractionDigits: 0}).format(100 * yed / pcap)}</span>` : '—', 'b', 'Yedek / ödenmiş sermaye. Enflasyon muhasebesi (2023 sonrası) bu oranı şişirir; bedelsiz şirket değerini artırmaz']);
   const nc = F.cash != null ? (F.cash || 0) - (F.debt || 0) : null;
   R.push(['Borçsuzluk', nc != null ? N(nc) : '—', nc != null ? (nc >= 0 ? 'y' : 'n') : 'b', nc != null ? (nc >= 0 ? 'Net nakit: nakit, finansal borçtan fazla' : 'Net borç: finansal borç, nakitten fazla') : '']);
   const mj = F.np != null && F.rev > 0 ? F.np / F.rev : null;
@@ -580,8 +583,8 @@ function olcutHTML(x) {
   return `<section class="own olc"><h3>Değerli ölçütler</h3>
     <p class="olsum">${k.length ? `Değerlendirilen ${k.length} ölçütten <b>${ok}</b> tanesini karşılıyor.` : 'Bu ölçütler için veri yok.'}</p>
     <table><tr><th>Ölçüt</th><th>Bu hisse</th><th></th></tr>
-    ${R.map(r => `<tr><td>${r[0]}<small>${r[3]}</small></td><td>${r[1]}</td><td><span class="st ${r[2]}">${S[r[2]]}</span></td></tr>`).join('')}</table>
-    <p class="fine">Uzun vadeli yatırımcıların sık baktığı ölçütler; yalnız bilgi amaçlıdır, sistemin model değerine ve sıralamasına katılmaz. 2019–2025 geriye dönük testinde küçük sermayeli hisseler büyüklerden belirgin iyi gitti; bu ölçütlerin hepsiyle yapılan seçim ise başlangıç ayına göre çok değişken sonuç verdi ve toplamda sistemin gerisinde kaldı. Bilanço ${F.period_end ? DATE(F.period_end) : ''}.</p></section>`;
+    ${R.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td><span class="st ${r[2]}">${S[r[2]]}</span></td></tr>`).join('')}</table>
+    <p class="fine">Yalnız bilgi; sıralamaya katılmaz. Açıklamalar Sistem sekmesinde. Bilanço ${F.period_end ? DATE(F.period_end) : ''}.</p></section>`;
 }
 
 /* "Şirketin durumu": bilanço ve gelir tablosundan otomatik güçlü / zayıf taraflar (her hafta, her hisse). Gelir kalemleri
