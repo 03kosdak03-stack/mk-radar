@@ -159,6 +159,10 @@ footer{color:var(--muted);font-size:.74rem}
 html.tgfs .wrap{padding-top:calc(14px + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));padding-bottom:calc(48px + var(--tg-safe-area-inset-bottom, 0px) + var(--tg-content-safe-area-inset-bottom, 0px))}
 html.tgfs .tabs{top:calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px))}
 html.tgfs .sheet{padding-top:calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px))}
+.olc .st{display:inline-block;min-width:1.6em;text-align:center;border-radius:6px;padding:1px 6px;font:700 .78rem var(--f)}
+.olc .st.y{background:var(--value-soft);color:var(--value)}.olc .st.n{background:var(--bad-soft);color:var(--bad)}.olc .st.b{background:var(--line);color:var(--muted)}
+.olc td small{display:block;color:var(--muted);font-family:var(--f);font-size:.74rem;white-space:normal}
+.olc .olsum{margin:0 0 8px;font-size:.9rem;display:block}
 </style>
 
 <div class="wrap" lang="tr">
@@ -555,6 +559,31 @@ function ownersHTML(x) {
     ${notes.length ? `<ul>${notes.map(n => `<li>${n}</li>`).join('')}</ul>` : ''}
     <p class="fine">KAP ortaklık yapısı (sermayede %5 ve üzeri doğrudan pay sahipleri)${D.owners_asof ? ', ' + DATE(D.owners_asof) + ' itibarıyla' : ''}.</p></section>`;
 }
+/* "Değerli ölçütler": uzun vadeli yatırımcıların sık baktığı ölçütler (küçük sermaye, yedek, bedelsiz potansiyeli, borçsuzluk,
+   kâr marjı, balon kontrolü). Yalnız bilgi; sistemin değerine ve sıralamasına katılmaz. */
+function olcutHTML(x) {
+  const F = (x.ctx || {}).fin; if (!F) return '';
+  const c = x.ctx || {}, mc = F.mcap || x.mcap, eq = F.equity, pcap = F.paid_capital;
+  const per = F.months === 12 ? 'yıllık' : F.months ? `ilk ${F.months} ay` : 'son dönem';
+  const R = [];   // [ölçüt, değer, durum y/n/b, açıklama]
+  const yed = eq != null && pcap ? eq - pcap : null;
+  R.push(['Küçük sermaye', pcap ? N(pcap) : '—', pcap ? (pcap < 400e6 ? 'y' : 'n') : 'b', pcap ? 'Ödenmiş sermaye 400 milyon TL altı mı' : 'Bir sonraki haftalık güncellemede görünür']);
+  R.push(['Güçlü yedek', yed != null ? N(yed) : '—', yed != null ? (yed > mc ? 'y' : 'n') : 'b', yed != null ? `Yedekler (özkaynak − sermaye) piyasa değerinin <span class="num">${x2(yed / mc)}</span> katı` : 'Özkaynak − ödenmiş sermaye']);
+  R.push(['Bedelsiz potansiyeli', yed != null && pcap ? `<span class="num">%${new Intl.NumberFormat('tr-TR', {maximumFractionDigits: 0}).format(100 * yed / pcap)}</span>` : '—', 'b', 'Yedek / ödenmiş sermaye. Enflasyon muhasebesi (2023 sonrası) bu oranı şişirir; bedelsiz şirket değerini artırmaz']);
+  const nc = F.cash != null ? (F.cash || 0) - (F.debt || 0) : null;
+  R.push(['Borçsuzluk', nc != null ? N(nc) : '—', nc != null ? (nc >= 0 ? 'y' : 'n') : 'b', nc != null ? (nc >= 0 ? 'Net nakit: nakit, finansal borçtan fazla' : 'Net borç: finansal borç, nakitten fazla') : '']);
+  const mj = F.np != null && F.rev > 0 ? F.np / F.rev : null;
+  R.push(['Kâr marjı', mj != null ? `<span class="num">${pct(mj).replace('+', '')}</span>` : '—', mj != null ? (mj >= 0.10 ? 'y' : 'n') : 'b', mj != null ? `Net kâr / hasılat, ${per}. %10 ve üstü yüksek sayıldı` : 'Hasılat verisi yok']);
+  R.push(['Balon değil', c.ret1y != null ? `<span class="num">${pct(c.ret1y)}</span>` : '—', c.ret1y != null ? (c.ret1y < 1 ? 'y' : 'n') : 'b', 'Son 1 yılda fiyat %100\'den fazla artmamış olmalı']);
+  const k = R.filter(r => r[2] !== 'b'), ok = k.filter(r => r[2] === 'y').length;
+  const S = { y: '✓', n: '✗', b: '·' };
+  return `<section class="own olc"><h3>Değerli ölçütler</h3>
+    <p class="olsum">${k.length ? `Değerlendirilen ${k.length} ölçütten <b>${ok}</b> tanesini karşılıyor.` : 'Bu ölçütler için veri yok.'}</p>
+    <table><tr><th>Ölçüt</th><th>Bu hisse</th><th></th></tr>
+    ${R.map(r => `<tr><td>${r[0]}<small>${r[3]}</small></td><td>${r[1]}</td><td><span class="st ${r[2]}">${S[r[2]]}</span></td></tr>`).join('')}</table>
+    <p class="fine">Uzun vadeli yatırımcıların sık baktığı ölçütler; yalnız bilgi amaçlıdır, sistemin model değerine ve sıralamasına katılmaz. 2019–2025 geriye dönük testinde bu ölçütlerle yapılan seçim borsa ortalamasının altında kaldı. Bilanço ${F.period_end ? DATE(F.period_end) : ''}.</p></section>`;
+}
+
 /* "Şirketin durumu": bilanço ve gelir tablosundan otomatik güçlü / zayıf taraflar (her hafta, her hisse). Gelir kalemleri
    raporun kendi dönemiyle (yılbaşından bugüne) ve geçen yılın aynı dönemiyle karşılaştırılır. */
 function companyHTML(x) {
@@ -648,6 +677,7 @@ function openDetail(t, push = true) {
     ${thesisHTML(x)}
     ${companyHTML(x)}
     ${ownersHTML(x)}
+    ${olcutHTML(x)}
     <section class="qc ${e.qlevel === 'KIRMIZI' ? 'bad' : e.qlevel === 'SARI' ? 'mid' : 'ok'}"><h3>Kalite kontrolü: ${e.qlevel === 'KIRMIZI' ? '⛔ KIRMIZI — sistem bu hisseyi seçmez' : e.qlevel === 'SARI' ? '⚠ SARI — okuyup kontrol edin' : '✓ TEMİZ'}</h3>
       ${e.quality.length ? `<ul>${e.quality.map(([l, m]) => `<li class="${l === 'KIRMIZI' ? 'r' : 'y'}"><b>${l}</b> ${esc(m)}</li>`).join('')}</ul>` : '<p>Bilanço içeriği (sermaye avansı, menkul kıymet, ertelenmiş vergi, ilişkili taraf alacağı, özkaynak sıçraması), son 6 ayın KAP olayları (SPK, kayyım/TMSF, konkordato, dava, bedelli/tahsisli artırım), grup şirketleri ve art arda taban kontrol edildi; sorun bulunmadı. Bu otomatik bir taramadır, KAP\'ı okumanın yerini tutmaz.</p>'}</section>
     <section class="why"><h3>${e.qlevel === 'KIRMIZI' ? 'Formül neden ucuz gösteriyor (kırmızı bayrak nedeniyle güvenilmez)' : x.potential > 0 ? 'Neden ucuz?' : 'Neden pahalı?'}</h3><p class="lead">${e.lead}</p><ul>${e.why.map(s => `<li>${s}</li>`).join('')}</ul></section>
