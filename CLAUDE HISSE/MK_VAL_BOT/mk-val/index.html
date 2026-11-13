@@ -581,7 +581,7 @@ function olcutHTML(x) {
     <p class="olsum">${k.length ? `Değerlendirilen ${k.length} ölçütten <b>${ok}</b> tanesini karşılıyor.` : 'Bu ölçütler için veri yok.'}</p>
     <table><tr><th>Ölçüt</th><th>Bu hisse</th><th></th></tr>
     ${R.map(r => `<tr><td>${r[0]}<small>${r[3]}</small></td><td>${r[1]}</td><td><span class="st ${r[2]}">${S[r[2]]}</span></td></tr>`).join('')}</table>
-    <p class="fine">Uzun vadeli yatırımcıların sık baktığı ölçütler; yalnız bilgi amaçlıdır, sistemin model değerine ve sıralamasına katılmaz. 2019–2025 geriye dönük testinde bu ölçütlerle yapılan seçim borsa ortalamasının altında kaldı. Bilanço ${F.period_end ? DATE(F.period_end) : ''}.</p></section>`;
+    <p class="fine">Uzun vadeli yatırımcıların sık baktığı ölçütler; yalnız bilgi amaçlıdır, sistemin model değerine ve sıralamasına katılmaz. 2019–2025 geriye dönük testinde küçük sermayeli hisseler büyüklerden belirgin iyi gitti; bu ölçütlerin hepsiyle yapılan seçim ise başlangıç ayına göre çok değişken sonuç verdi ve toplamda sistemin gerisinde kaldı. Bilanço ${F.period_end ? DATE(F.period_end) : ''}.</p></section>`;
 }
 
 /* "Şirketin durumu": bilanço ve gelir tablosundan otomatik güçlü / zayıf taraflar (her hafta, her hisse). Gelir kalemleri
